@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedro's Downfall</title>
+    <style>
+        body { background: #0a0a0a; color: #00ff41; font-family: 'Courier New', Courier, monospace; text-align: center; padding: 40px; }
+        .container { border: 2px solid #444; padding: 30px; border-radius: 15px; display: inline-block; background: #111; box-shadow: 0 0 20px rgba(0,255,65,0.2); min-width: 350px; }
+        h1 { text-transform: uppercase; letter-spacing: 5px; margin-bottom: 30px; color: #ff3e3e; }
+        input, button { display: block; width: 90%; margin: 15px auto; padding: 12px; border-radius: 5px; border: 1px solid #333; background: #1a1a1a; color: #eee; font-size: 14px; }
+        button { background: #ff3e3e; color: white; cursor: pointer; border: none; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #b71c1c; box-shadow: 0 0 10px #ff3e3e; }
+        button:disabled { background: #333; color: #777; cursor: not-allowed; }
+        #adminZone { display: none; border-top: 2px dashed #444; margin-top: 20px; padding-top: 20px; }
+        #progressContainer { width: 90%; background: #222; height: 25px; border-radius: 15px; margin: 20px auto; display: none; overflow: hidden; border: 1px solid #444; }
+        #progressBar { width: 0%; height: 100%; background: linear-gradient(90deg, #ff3e3e, #00ff41); transition: width 0.1s; }
+        #status { font-weight: bold; margin-top: 15px; color: #888; }
+        .key-display { background: #000; color: #00ff41; padding: 10px; border: 1px solid #00ff41; margin-top: 10px; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Pedro's Downfall</h1>
+
+    <input type="password" id="adminPass" placeholder="Enter Access Code" oninput="revealAdmin()">
+
+    <div id="adminZone">
+        <h3 style="color: #ff3e3e;">[ OWNER CONTROL ]</h3>
+        <input type="file" id="scriptFile" accept=".gpc,.bin">
+        <button onclick="handleUpload()">Upload Script & Generate Key</button>
+        <div id="keyBox" style="display:none">
+            <p>One-Time Key:</p>
+            <div id="generatedKey" class="key-display"></div>
+        </div>
+    </div>
+
+    <div id="userZone">
+        <h3>[ USER LOADER ]</h3>
+        <input type="text" id="userKey" placeholder="Enter 6-Digit Key">
+        <button onclick="connectZen()">1. Connect Cronus Zen</button>
+        <button id="flashBtn" onclick="processFlash()" disabled>2. Begin Flash</button>
+        
+        <div id="progressContainer">
+            <div id="progressBar"></div>
+        </div>
+        <p id="status">Status: Waiting for device...</p>
+    </div>
+</div>
+
+<script>
+    const API_URL = "https://pedros-downfall-server.onrender.com";
+    let device = null;
+    let scriptData = null;
+
+    // Reveal admin tools if password is correct
+    function revealAdmin() {
+        const pass = document.getElementById('adminPass').value;
+        if (pass === "FuckCj2026") {
+            document.getElementById('adminZone').style.display = "block";
+            document.getElementById('adminPass').style.borderColor = "#00ff41";
+        }
+    }
+
+    // Owner: Upload script to Render
+    async function handleUpload() {
+        const fileInput = document.getElementById('scriptFile');
+        if (!fileInput.files[0]) return alert("Select a file first!");
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            const rawData = reader.result;
+            try {
+                const response = await fetch(`${API_URL}/upload`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: "FuckCj2026", scriptData: rawData })
+                });
+                const data = await response.json();
+                document.getElementById('keyBox').style.display = "block";
+                document.getElementById('generatedKey').innerText = data.key;
+            } catch (err) {
+                alert("Upload failed. Is the Render server awake?");
+            }
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    }
+
+    // User: Connect to Zen via WebUSB
+    async function connectZen() {
+        try {
+            // Cronus Zen Vendor ID
+            device = await navigator.usb.requestDevice({ filters: [{ vendorId: 0x2FE3 }] });
+            await device.open();
+            await device.selectConfiguration(1);
+            await device.claimInterface(0);
+            
+            document.getElementById('status').innerText = "Status: Zen Connected!";
+            document.getElementById('status').style.color = "#00ff41";
+            document.getElementById('flashBtn').disabled = false;
+        } catch (err) {
+            console.error(err);
+            alert("Connection failed. Close Zen Studio and use Chrome/Edge.");
+        }
+    }
+
+    // User: Fetch script and flash
+    async function processFlash() {
+        const key = document.getElementById('userKey').value;
+        if (!key) return alert("Enter a key!");
+
+        document.getElementById('status').innerText = "Status: Fetching Script...";
+        
+        try {
+            const response = await fetch(`${API_URL}/fetch-script`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: key })
+            });
+
+            if (response.status !== 200) throw new Error("Invalid Key");
+
+            const result = await response.json();
+            scriptData = result.script;
+
+            // Start Flash Progress
+            document.getElementById('progressContainer').style.display = "block";
+            document.getElementById('flashBtn').disabled = true;
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    finalize();
+                }
+                document.getElementById('progressBar').style.width = progress + "%";
+                document.getElementById('status').innerText = `Status: Flashing ${Math.round(progress)}%`;
+            }, 150);
+
+        } catch (err) {
+            alert("Error: Key invalid or already used.");
+            document.getElementById('status').innerText = "Status: Failed.";
+        }
+    }
+
+    function finalize() {
+        document.getElementById('status').innerText = "Status: Flash Complete!";
+        document.getElementById('status').style.color = "#00ff41";
+        
+        // SECURITY: WIPE ALL TRACES
+        scriptData = null; 
+        alert("Success! Script loaded to Zen. Data purged.");
+        
+        // Forced refresh to clear browser memory
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
+    }
+</script>
+
+</body>
+</html>
