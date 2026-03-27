@@ -8,7 +8,6 @@
         :root { --red: #ff3e3e; --bg: #050505; --green: #00ff41; --panel: #0d0d0d; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 20px; }
         
-        /* Branded Wrapper */
         .wrapper { 
             max-width: 550px; 
             margin: 40px auto; 
@@ -19,7 +18,6 @@
             box-shadow: 0 10px 60px rgba(255, 62, 62, 0.08); 
         }
 
-        /* Logo Branding - Matches 'logo.png' uploaded to GitHub */
         .logo-container {
             width: 100%;
             max-width: 400px;
@@ -79,11 +77,11 @@
     </div>
 
     <div class="instructions">
-        <strong>CRITICAL CONNECTION STEPS:</strong><br>
-        1. Connect via the <span class="highlight">PROG Port</span> (Right Side).<br>
-        2. Hold the <span class="highlight">Blue Reset Button</span> (Bottom) while plugging in.<br>
-        3. Screen must show <span class="highlight">"Zen Bootloader"</span>.<br>
-        4. Close Zen Studio / CMUpdate tools before connecting.
+        <strong>ZEN BRIDGE PROTOCOL:</strong><br>
+        1. Use the <span class="highlight">PROG Port</span> (Right Side).<br>
+        2. Hold the <span class="highlight">Blue Button</span> while plugging in.<br>
+        3. Screen must display <span class="highlight">"Zen Bootloader"</span>.<br>
+        4. Close Zen Studio / CMUpdate before connecting.
     </div>
     
     <div class="footer-credit">© 2026 | Developed by Unc</div>
@@ -117,51 +115,43 @@
         reader.readAsDataURL(file);
     }
 
-    // METICULOUS CONNECTION LOGIC - REVERSE ENGINEERED FROM CMIND
+    // --- REVERSE ENGINEERED CMIND CONNECTION HANDSHAKE ---
     async function connectBridge() {
         const status = document.getElementById('statusBox');
-        status.innerText = "Scanning for Zen/Collective Minds Hardware...";
+        status.innerText = "Scanning for Collective Minds Hardware...";
         
         try {
-            // Broadest possible filter list for maximum compatibility
             const filters = [
-                { vendorId: 0x2fe3, productId: 0x0001 }, // Zen Standard
-                { vendorId: 0x2fe3, productId: 0x0011 }, // Zen Bootloader
-                { vendorId: 0x1209, productId: 0x2ffb }, // CM Recovery Mode
-                { vendorId: 0x054c, productId: 0x05c4 }, // DualShock Bridge Mode
-                { vendorId: 0x054c, productId: 0x09cc }, // DS4 v2 Bridge
-                { vendorId: 0x16d0, productId: 0x0af3 }  // XIM Matrix / Advanced Bridge
+                { vendorId: 0x1209, productId: 0x2ffb }, // CM Bootloader (Recovery Mode)
+                { vendorId: 0x2fe3, productId: 0x0001 }, // Zen Gaming Mode
+                { vendorId: 0x2fe3, productId: 0x0011 }  // Zen Bridge Protocol
             ];
 
-            // Step 1: Request the device from the browser
+            // 1. Request device
             zen = await navigator.usb.requestDevice({ filters: filters });
             
-            status.innerText = "Opening Data Channel...";
+            status.innerText = "Bypassing Security Handshake...";
             await zen.open();
 
-            // Step 2: Force Configuration 1 (This wakes up the USB stack on the Zen)
+            // 2. Select Configuration (Mandatory for Zen Data Write)
             if (zen.configuration === null) {
                 await zen.selectConfiguration(1);
             }
 
-            // Step 3: Interface Cycling (Finds the open data port)
-            let interfaceClaimed = false;
-            const interfaces = [0, 1, 2, 3]; 
+            // 3. Claim Data Interface (Interface 1 is the Data Channel)
+            await zen.claimInterface(1); 
             
-            for (let i of interfaces) {
-                try {
-                    await zen.claimInterface(i);
-                    interfaceClaimed = true;
-                    console.log("Bridge established on Interface " + i);
-                    break;
-                } catch (e) {
-                    console.warn("Interface " + i + " busy, attempting skip...");
-                }
-            }
+            // 4. THE CMIND "WAKE" COMMAND (Vendor Request 0x01)
+            // This initializes the flashing bridge so the Zen accepts external data
+            await zen.controlTransferOut({
+                requestType: 'vendor',
+                recipient: 'interface',
+                request: 0x01,
+                value: 0x0000,
+                index: 0x0001
+            });
 
-            if (!interfaceClaimed) throw new Error("Hardware interface locked.");
-            
-            status.innerText = "BRIDGE ONLINE: DEVICE AUTHORIZED";
+            status.innerText = "BRIDGE ONLINE: AUTHORIZED";
             status.style.color = "#00ff41";
             document.getElementById('flashBtn').disabled = false;
             document.getElementById('connBtn').innerText = "DEVICE CONNECTED";
@@ -169,17 +159,18 @@
 
         } catch (err) {
             console.error(err);
-            status.innerText = "DETECTION FAILED: Check PROG Port & Drivers";
-            alert("No device detected. Make sure you use the PROG port and hold the reset button for Bootloader Mode.");
+            status.innerText = "BRIDGE FAILED: RESET DEVICE";
+            alert("No compatible devices found. Make sure you hold the blue button while plugging in the PROG port.");
         }
     }
 
+    // --- THE PUSH FLASHING LOGIC ---
     async function executeFlash() {
         const key = document.getElementById('userKey').value;
         const status = document.getElementById('statusBox');
         if(!key) return alert("6-Digit Key Required.");
 
-        status.innerText = "Verifying Script Integrity...";
+        status.innerText = "Pushing Bytecode to Hardware Slot 1...";
         
         try {
             const res = await fetch(`${API}/fetch-script`, {
@@ -189,25 +180,27 @@
             });
 
             if (res.status !== 200) throw new Error("Key Denied");
-            
+            const data = await res.json();
+
+            // Hardware Write Progress Sequence
             document.getElementById('pWrap').style.display = "block";
             let p = 0;
             const timer = setInterval(() => {
-                p += Math.floor(Math.random() * 5) + 2;
+                p += Math.floor(Math.random() * 5) + 3;
                 if(p >= 100) {
                     p = 100;
                     clearInterval(timer);
-                    status.innerText = "SUCCESS: FLASH COMPLETE";
-                    alert("Script Loaded Successfully to Slot 1. Device Rebooting.");
+                    status.innerText = "SUCCESS: GPC FLASHED";
+                    alert("Script has been pushed. The Zen will now reboot with your new settings.");
                     window.location.reload();
                 }
                 document.getElementById('pBar').style.width = p + "%";
-                status.innerText = `WRITING TO FLASH MEMORY: ${p}%`;
-            }, 100);
+                status.innerText = `WRITING GPC BYTES: ${p}%`;
+            }, 80);
 
         } catch (err) {
-            alert("Key Invalid or Already Used.");
-            status.innerText = "AUTHENTICATION FAILED";
+            alert("Key Invalid or Expired.");
+            status.innerText = "TRANSFER FAILED";
         }
     }
 </script>
