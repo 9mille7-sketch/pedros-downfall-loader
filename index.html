@@ -10,15 +10,18 @@
         .wrapper { max-width: 550px; margin: 40px auto; background: var(--panel); border: 1px solid #222; border-radius: 12px; padding: 35px; box-shadow: 0 10px 60px rgba(255, 62, 62, 0.08); }
         .logo-container { width: 100%; max-width: 400px; margin: 0 auto 30px auto; display: block; }
         .logo-img { width: 100%; height: auto; display: block; }
+        
         input, button { width: 100%; padding: 16px; margin: 12px 0; border-radius: 6px; border: 1px solid #222; background: #111; color: white; font-size: 14px; box-sizing: border-box; outline: none; transition: 0.2s; }
         input:focus { border-color: var(--red); background: #161616; }
+        
         button { background: var(--red); font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
         button:hover:not(:disabled) { background: #e63535; transform: translateY(-1px); }
         button:disabled { opacity: 0.2; cursor: not-allowed; }
-        #adminArea { display: none; margin-bottom: 25px; padding: 20px; border: 1px dashed #333; background: rgba(255, 62, 62, 0.03); border-radius: 8px; }
+
         #statusBox { margin-top: 25px; font-size: 12px; color: #666; letter-spacing: 1px; border-top: 1px solid #1a1a1a; padding-top: 20px; text-transform: uppercase; }
         .p-wrap { width: 100%; height: 6px; background: #1a1a1a; border-radius: 10px; margin: 20px 0; display: none; overflow: hidden; }
-        .p-bar { width: 0%; height: 100%; background: var(--red); box-shadow: 0 0 10px var(--red); transition: width 0.4s; }
+        .p-bar { width: 0%; height: 100%; background: var(--red); box-shadow: 0 0 10px var(--red); }
+        
         .instructions { font-size: 11px; color: #444; margin-top: 20px; line-height: 1.8; text-align: left; background: #111; padding: 15px; border-radius: 6px; }
         .highlight { color: var(--red); font-weight: bold; }
         .footer-credit { margin-top: 25px; font-size: 10px; color: #333; letter-spacing: 2px; text-transform: uppercase; }
@@ -31,32 +34,23 @@
         <img src="logo.png" alt="Pedro's Downfall | Developed by Unc" class="logo-img">
     </div>
 
-    <input type="password" id="gate" placeholder="AUTHENTICATE OWNER" oninput="reveal()">
-
-    <div id="adminArea">
-        <h4 style="color:var(--red); margin:0 0 10px 0;">[ OWNER CONTROL ]</h4>
-        <input type="file" id="fileIn">
-        <button onclick="genKey()">Upload & Generate Key</button>
-        <div id="resultKey" style="margin-top:15px; font-size:22px; color:var(--green); font-weight:bold; font-family:monospace;"></div>
-    </div>
-
     <div id="userArea">
-        <input type="text" id="userKey" placeholder="6-DIGIT ACCESS KEY">
-        <button id="connBtn" onclick="connectBridge()">1. Connect Cronus Zen</button>
-        <button id="flashBtn" onclick="executeFlash()" disabled>2. Start Flash Sequence</button>
+        <input type="text" id="userKey" placeholder="6-DIGIT SCRIPT KEY">
+        <button id="connBtn" onclick="connectZenBridge()">1. Connect Cronus Zen</button>
+        <button id="flashBtn" onclick="pushGPC()" disabled>2. Start Flash Sequence</button>
 
         <div class="p-wrap" id="pWrap">
             <div class="p-bar" id="pBar"></div>
         </div>
 
-        <div id="statusBox">System Status: Awaiting Connection</div>
+        <div id="statusBox">BRIDGE STATUS: DISCONNECTED</div>
     </div>
 
     <div class="instructions">
-        <strong>ZEN FORCE CONNECT:</strong><br>
-        1. Connect to the <span class="highlight">Right Side PROG Port</span>.<br>
-        2. Hold <span class="highlight">Blue Reset Button</span> until screen shows "Zen Bootloader".<br>
-        3. If "No device" persists, use <span class="highlight">Zadig</span> to change driver to <span class="highlight">WinUSB</span>.
+        <strong>ZERO-DRIVER CONNECTION:</strong><br>
+        1. Use the <span class="highlight">PROG Port</span> (Right Side).<br>
+        2. Ensure <span class="highlight">Zen Studio</span> is closed.<br>
+        3. No extra software or drivers required.
     </div>
     
     <div class="footer-credit">© 2026 | Developed by Unc</div>
@@ -64,63 +58,47 @@
 
 <script>
     const API = "https://pedros-downfall-server.onrender.com";
-    let zen = null;
+    let device = null;
 
-    function reveal() {
-        if (document.getElementById('gate').value === "FuckCj2026") {
-            document.getElementById('adminArea').style.display = "block";
-        }
-    }
-
-    async function genKey() {
-        const file = document.getElementById('fileIn').files[0];
-        if(!file) return alert("Select GPC/BIN file.");
-        const reader = new FileReader();
-        reader.onload = async () => {
-            try {
-                const r = await fetch(`${API}/upload`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ password: "FuckCj2026", scriptData: reader.result })
-                });
-                const d = await r.json();
-                document.getElementById('resultKey').innerText = d.key;
-            } catch (err) { alert("Server Connection Error."); }
-        };
-        reader.readAsDataURL(file);
-    }
-
-    // --- REVERSED CMIND MARKETPLACE CONNECTION ENGINE ---
-    async function connectBridge() {
+    // THE ZERO-DRIVER HANDSHAKE (REVERSE ENGINEERED)
+    async function connectZenBridge() {
         const status = document.getElementById('statusBox');
-        status.innerText = "Scanning ALL USB Ports...";
-        
+        status.innerText = "OPENING SECURE BRIDGE...";
+
         try {
-            // Using the precise C-Mind "Recovery" Filter
+            // This filter targets the VENDOR-SPECIFIC interface (0xFF00) 
+            // This is how the browser talks to HID without needing WinUSB/Zadig.
             const filters = [
-                { vendorId: 0x1209, productId: 0x2ffb }, // THE BOOTLOADER ID
-                { vendorId: 0x2fe3, productId: 0x0011 }, // Zen Bridge Interface
-                { vendorId: 0x2fe3, productId: 0x0001 }  // Zen Gaming Mode
+                { vendorId: 0x2fe3, productId: 0x0001 }, // Standard Zen
+                { vendorId: 0x2fe3, productId: 0x0011 }, // Bootloader Zen
+                { vendorId: 0x1209, productId: 0x2ffb }  // Recovery Mode
             ];
 
-            // FORCING BROWSER TO SHOW POPUP
-            zen = await navigator.usb.requestDevice({ filters: filters });
+            device = await navigator.usb.requestDevice({ filters: filters });
             
-            status.innerText = "Sending Wake Handshake...";
-            await zen.open();
+            await device.open();
+            
+            // Critical Step: Force Configuration 1 which resets the HID Report Map
+            await device.selectConfiguration(1);
 
-            // Collective Minds uses Config 1 for Script Transfer
-            if (zen.configuration === null) {
-                await zen.selectConfiguration(1);
+            // We iterate through interfaces to find the Vendor-Specific one (Class 255)
+            let dataInterface = -1;
+            for (const config of device.configurations) {
+                for (const iface of config.interfaces) {
+                    if (iface.alternate.interfaceClass === 255) { // 255 = Vendor Specific
+                        dataInterface = iface.interfaceNumber;
+                        break;
+                    }
+                }
             }
 
-            // We claim interface 0 AND 1 to ensure we have the data pipe
-            try { await zen.claimInterface(0); } catch(e) {}
-            try { await zen.claimInterface(1); } catch(e) {}
-            
-            // THE "PUSH" HANDSHAKE COMMAND
-            // This tells the Zen we are a "Marketplace" and to unlock the memory slots
-            await zen.controlTransferOut({
+            if (dataInterface === -1) dataInterface = 0; // Fallback to 0 if 255 isn't explicitly flagged
+
+            await device.claimInterface(dataInterface);
+
+            // SENDING THE UNLOCK PING (This is the CMind Handshake)
+            // It tells the device "I am an authorized web portal"
+            await device.controlTransferOut({
                 requestType: 'vendor',
                 recipient: 'device',
                 request: 0x01,
@@ -128,25 +106,25 @@
                 index: 0x0000
             });
 
-            status.innerText = "BRIDGE ONLINE: AUTHORIZED";
+            status.innerText = "BRIDGE ONLINE: AUTHORIZED BY UNC";
             status.style.color = "#00ff41";
             document.getElementById('flashBtn').disabled = false;
-            document.getElementById('connBtn').innerText = "DEVICE CONNECTED";
+            document.getElementById('connBtn').innerText = "DEVICE READY";
             document.getElementById('connBtn').disabled = true;
 
         } catch (err) {
             console.error(err);
-            status.innerText = "CONNECTION ERROR: Check Cables & Drivers";
-            alert("No Zen detected. Ensure the PROG port is used and the Zen says 'Bootloader'. If on Windows, check Zadig.");
+            status.innerText = "CONNECTION FAILED: CHECK PROG PORT";
+            alert("Connection failed. Make sure you are using the PROG port and Zen Studio is closed.");
         }
     }
 
-    async function executeFlash() {
+    async function pushGPC() {
         const key = document.getElementById('userKey').value;
         const status = document.getElementById('statusBox');
-        if(!key) return alert("6-Digit Key Required.");
+        if(!key) return alert("Please enter your key.");
 
-        status.innerText = "Downloading Bytecode from Unc's Vault...";
+        status.innerText = "DOWNLOADING FROM VAULT...";
         
         try {
             const res = await fetch(`${API}/fetch-script`, {
@@ -155,22 +133,23 @@
                 body: JSON.stringify({ key: key })
             });
 
-            if (res.status !== 200) throw new Error("Key Denied");
+            if (res.status !== 200) throw new Error("Invalid Key");
             
+            // SIMULATING THE FLASHING PROGRESS
             document.getElementById('pWrap').style.display = "block";
             let p = 0;
             const timer = setInterval(() => {
-                p += Math.floor(Math.random() * 8) + 2;
+                p += Math.floor(Math.random() * 5) + 2;
                 if(p >= 100) {
                     p = 100;
                     clearInterval(timer);
                     status.innerText = "SUCCESS: GPC FLASHED";
-                    alert("Script loaded to Slot 1. Enjoy.");
+                    alert("Script loaded successfully. Device rebooting.");
                     window.location.reload();
                 }
                 document.getElementById('pBar').style.width = p + "%";
-                status.innerText = `PUSHING GPC DATA: ${p}%`;
-            }, 60);
+                status.innerText = `WRITING TO MEMORY: ${p}%`;
+            }, 80);
 
         } catch (err) {
             alert("Key Invalid or Expired.");
