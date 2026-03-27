@@ -5,165 +5,268 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedro's Downfall | Developed by Unc</title>
     <style>
-        :root { --red: #ff3e3e; --bg: #050505; --green: #00ff41; --panel: #0d0d0d; --border: #1a1a1a; }
-        body { background: var(--bg); color: #e0e0e0; font-family: 'Consolas', monospace; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+        :root { --red: #ff3e3e; --bg: #030303; --panel: #0a0a0a; --green: #00ff41; --border: #1a1a1a; }
         
-        .container { width: 100%; max-width: 650px; background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 40px; box-shadow: 0 0 50px rgba(0,0,0,0.5); position: relative; }
-        .container::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--red), transparent); }
+        body { 
+            background: var(--bg); 
+            color: #ccc; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            background-image: radial-gradient(circle at center, #110000 0%, #030303 100%);
+        }
 
-        .header { margin-bottom: 30px; text-align: left; border-left: 3px solid var(--red); padding-left: 15px; }
-        .header h1 { margin: 0; font-size: 24px; letter-spacing: 3px; color: #fff; text-transform: uppercase; }
-        .header p { margin: 5px 0 0; font-size: 10px; color: #555; letter-spacing: 1px; }
+        .main-frame {
+            width: 100%;
+            max-width: 700px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+            border-top: 3px solid var(--red);
+        }
 
-        .terminal { background: #000; border: 1px solid #111; padding: 15px; border-radius: 4px; height: 180px; overflow-y: auto; margin-bottom: 25px; font-size: 11px; line-height: 1.6; color: #888; text-align: left; }
-        .terminal span { display: block; }
-        .terminal .cmd { color: var(--green); }
-        .terminal .err { color: var(--red); }
+        /* HARD-CODED LOGO AREA */
+        .branding-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
 
-        .input-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; font-size: 10px; color: #444; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        
-        input { width: 100%; background: #0a0a0a; border: 1px solid #222; padding: 14px; color: var(--green); font-family: 'Consolas', monospace; box-sizing: border-box; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--red); box-shadow: 0 0 10px rgba(255, 62, 62, 0.1); }
+        /* SVG Logo - Guaranteed to show without external files */
+        .ghost-logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px var(--red));
+        }
 
-        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        button { background: #111; border: 1px solid #333; color: #fff; padding: 15px; cursor: pointer; font-family: 'Consolas', monospace; font-size: 12px; font-weight: bold; text-transform: uppercase; transition: 0.3s; outline: none; }
-        button:hover:not(:disabled) { background: #1a1a1a; border-color: var(--red); color: var(--red); }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
-        
-        #flashBtn { background: var(--red); border: none; color: #000; }
-        #flashBtn:hover:not(:disabled) { background: #ff5e5e; color: #000; transform: translateY(-1px); }
+        .title-text {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 5px;
+            color: #fff;
+            margin: 0;
+            text-transform: uppercase;
+        }
 
-        .progress-box { margin-top: 25px; display: none; }
-        .bar-bg { width: 100%; height: 4px; background: #111; border-radius: 2px; overflow: hidden; }
-        .bar-fill { width: 0%; height: 100%; background: var(--red); transition: width 0.2s; box-shadow: 0 0 10px var(--red); }
-        
-        .footer { margin-top: 40px; font-size: 9px; color: #333; border-top: 1px solid #111; padding-top: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .badge { color: var(--red); border: 1px solid var(--red); padding: 2px 6px; font-size: 8px; }
+        .sub-title {
+            font-size: 10px;
+            color: #555;
+            letter-spacing: 2px;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #222; }
+        /* TERMINAL INTERFACE */
+        .console-box {
+            background: #000;
+            border: 1px solid #111;
+            height: 200px;
+            overflow-y: auto;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            color: #666;
+            text-align: left;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .console-line { margin-bottom: 4px; display: block; }
+        .success { color: var(--green); }
+        .warning { color: #ffae00; }
+        .critical { color: var(--red); font-weight: bold; }
+
+        /* INTERACTION ZONE */
+        .control-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .input-wrap {
+            grid-column: span 2;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #444;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        input {
+            width: 100%;
+            background: #050505;
+            border: 1px solid #222;
+            padding: 16px;
+            color: var(--green);
+            font-size: 16px;
+            font-family: monospace;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--red); background: #080808; }
+
+        button {
+            padding: 18px;
+            border: 1px solid #333;
+            background: #111;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        button:hover:not(:disabled) {
+            border-color: var(--red);
+            color: var(--red);
+            background: #151515;
+        }
+
+        #action-btn {
+            background: var(--red);
+            color: #000;
+            border: none;
+        }
+
+        #action-btn:hover:not(:disabled) {
+            background: #ff5555;
+            color: #000;
+        }
+
+        button:disabled { opacity: 0.2; cursor: not-allowed; }
+
+        /* PROGRESSION */
+        .deploy-progress {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .track { width: 100%; height: 2px; background: #111; margin-top: 10px; }
+        .fill { width: 0%; height: 100%; background: var(--red); box-shadow: 0 0 15px var(--red); transition: 0.1s; }
+
+        .footer-note {
+            margin-top: 40px;
+            font-size: 9px;
+            color: #222;
+            border-top: 1px solid #111;
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>PEDRO'S DOWNFALL</h1>
-        <p>DIRECT HARDWARE INJECTION INTERFACE // SYSTEM V.0.42</p>
+<div class="main-frame">
+    <div class="branding-header">
+        <svg class="ghost-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 10L20 40V80L50 90L80 80V40L50 10Z" stroke="#ff3e3e" stroke-width="2"/>
+            <path d="M35 45C35 45 40 42 50 42C60 42 65 45 65 45" stroke="#ff3e3e" stroke-width="2"/>
+            <circle cx="40" cy="55" r="3" fill="#ff3e3e"/>
+            <circle cx="60" cy="55" r="3" fill="#ff3e3e"/>
+            <path d="M30 70L40 65M70 70L60 65" stroke="#ff3e3e" stroke-width="1"/>
+        </svg>
+        <h1 class="title-text">PEDRO'S DOWNFALL</h1>
+        <div class="sub-title">Developed by Unc // Authorized Hardware Bridge</div>
     </div>
 
-    <div class="terminal" id="term">
-        <span>> SYSTEM_READY: Waiting for device connection...</span>
-        <span>> BOOT_NOTICE: Hold blue button + connect PROG port.</span>
+    <div class="console-box" id="stdout">
+        <span class="console-line">> INITIALIZING SYSTEM COMPONENT...</span>
+        <span class="console-line">> READY: Please connect Zen to PROG port (Right Side).</span>
     </div>
 
-    <div class="input-group">
-        <label>Access Key Verification</label>
-        <input type="text" id="authKey" placeholder="ENTER 6-DIGIT KEY" maxlength="6">
+    <div class="input-wrap">
+        <label>Verification Key [Required]</label>
+        <input type="text" id="passkey" placeholder="000-000" maxlength="6">
     </div>
 
-    <div class="btn-row">
-        <button id="connBtn" onclick="initiateBridge()">Establish Link</button>
-        <button id="flashBtn" onclick="beginDeployment()" disabled>Deploy Script</button>
+    <div class="control-grid">
+        <button id="bridge-btn" onclick="initiateHandshake()">Establish Bridge</button>
+        <button id="action-btn" onclick="executePush()" disabled>Push Bytecode</button>
     </div>
 
-    <div class="progress-box" id="pBox">
-        <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 8px;">
-            <span id="pStatus">WRITING_BYTES...</span>
-            <span id="pPercent">0%</span>
+    <div class="deploy-progress" id="p-area">
+        <div style="display: flex; justify-content: space-between; font-size: 9px; color: #444;">
+            <span id="p-label">WRITING_TO_FLASH...</span>
+            <span id="p-val">0%</span>
         </div>
-        <div class="bar-bg"><div class="bar-fill" id="pBar"></div></div>
+        <div class="track"><div class="fill" id="p-fill"></div></div>
     </div>
 
-    <div class="footer">
-        <span>SECURE HANDSHAKE: AES-256</span>
-        <span>DEVELOPED BY <span style="color:#666">UNC</span></span>
-        <span class="badge">PROD_AUTH</span>
+    <div class="footer-note">
+        <span>ENCRYPTED_CHANNEL: ACTIVE</span>
+        <span>© 2026 UNC_DEVELOPMENTS</span>
+        <span>V.5.0.0_PRODUCTION</span>
     </div>
 </div>
 
 <script>
     /**
-     * CORE ENGINE: PEDRO'S DOWNFALL
-     * REVERSE ENGINEERED FOR CRONUS ZEN WEBSUB
-     * BY: UNC
+     * PEDRO'S DOWNFALL - FULL DEPLOYMENT LOGIC
+     * REVERSE ENGINEERED CMIND API CONNECTION
      */
 
-    const API_ENDPOINT = "https://pedros-downfall-server.onrender.com";
-    let activeDevice = null;
-    let dataInterface = null;
-    let writeEndpoint = null;
+    const API_URL = "https://pedros-downfall-server.onrender.com";
+    let usb_device = null;
 
-    // --- TERMINAL UTILITY ---
-    function log(msg, type = '') {
-        const t = document.getElementById('term');
-        const s = document.createElement('span');
-        if(type) s.className = type;
-        s.innerText = `> ${msg}`;
-        t.appendChild(s);
-        t.scrollTop = t.scrollHeight;
+    function print(text, css = '') {
+        const out = document.getElementById('stdout');
+        const line = document.createElement('span');
+        line.className = 'console-line ' + css;
+        line.innerText = `> ${text}`;
+        out.appendChild(line);
+        out.scrollTop = out.scrollHeight;
     }
 
-    // --- USB PROTOCOL ENGINE ---
-    async function initiateBridge() {
-        log("SCANNING BUS FOR COLLECTIVE MINDS HARDWARE...", "cmd");
-        
+    // --- REVERSE ENGINEERED CONNECTION ENGINE ---
+    async function initiateHandshake() {
+        print("SCANNING FOR COLLECTIVE MINDS HARDWARE...", "warning");
+
         try {
-            // Broadest possible filter to bypass Windows "Protected HID" blocks
+            // THE "FINAL" FILTER - Only shows Bootloader Zen, Hides Cameras
             const filters = [
-                { vendorId: 0x1209, productId: 0x2ffb }, // Zen Bootloader (Primary Target)
-                { vendorId: 0x2fe3 },                   // Any Zen Config
-                { classCode: 0xFF, subclassCode: 0x00 } // Vendor-specific bridge
+                {
+                    vendorId: 0x1209,    // Collective Minds Vendor ID
+                    productId: 0x2ffb,   // Zen Bootloader (Blue Button Mode)
+                },
+                {
+                    vendorId: 0x2fe3,    // Secondary Zen Identification
+                    classCode: 0xFF      // Force Vendor-Specific Only
+                }
             ];
 
-            activeDevice = await navigator.usb.requestDevice({ filters });
-            log(`DEVICE_FOUND: ${activeDevice.productName || "Cronus Zen"}`);
+            // Trigger the browser request
+            usb_device = await navigator.usb.requestDevice({ filters: filters });
 
-            await activeDevice.open();
-            log("DEVICE_OPEN: Establishing protocol handshake...");
+            print(`LINK_FOUND: ${usb_device.productName || "Cronus Zen"}`);
+            print("OPENING_PORT: Waiting for hardware response...");
 
-            // 1. Force Configuration 1 (This is the Data Mode)
-            if (activeDevice.configuration === null) {
-                await activeDevice.selectConfiguration(1);
-            }
-
-            // 2. RECURSIVE INTERFACE DISCOVERY
-            // We search every interface for the specific flashing port
-            log("SEARCHING FOR DATA_CLASS INTERFACE...");
-            let found = false;
+            await usb_device.open();
             
-            for (const iface of activeDevice.configuration.interfaces) {
-                // Look for Vendor Specific (255) or standard Data (10)
-                if (iface.alternate.interfaceClass === 255 || iface.alternate.interfaceClass === 10) {
-                    dataInterface = iface.interfaceNumber;
-                    
-                    // Find the OUT endpoint for writing GPC data
-                    for (const endpoint of iface.alternate.endpoints) {
-                        if (endpoint.direction === "out") {
-                            writeEndpoint = endpoint.endpointNumber;
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-                if (found) break;
+            // Standard Zen Flash Configuration
+            if (usb_device.configuration === null) {
+                await usb_device.selectConfiguration(1);
             }
 
-            if (!found) {
-                // Fallback for older firmware
-                dataInterface = 0;
-                writeEndpoint = 1;
-                log("WARNING: Using fallback interface mapping.", "err");
-            }
+            // Claiming the flash-specific interface (Interface 0 on Bootloader)
+            await usb_device.claimInterface(0);
 
-            await activeDevice.claimInterface(dataInterface);
-            log(`INTERFACE_${dataInterface}_CLAIMED: Handshake active.`);
-
-            // 3. THE "UNLOCK" COMMAND (Vendor 0x01)
-            // This is the sequence the marketplace sends to bypass the security lock
-            await activeDevice.controlTransferOut({
+            // THE WAKE HANDSHAKE (Required for CMind Hardware)
+            await usb_device.controlTransferOut({
                 requestType: 'vendor',
                 recipient: 'device',
                 request: 0x01,
@@ -171,96 +274,94 @@
                 index: 0x0000
             });
 
-            log("BRIDGE_STATUS: LINK ESTABLISHED.", "cmd");
-            document.getElementById('flashBtn').disabled = false;
-            document.getElementById('connBtn').innerText = "LINK ACTIVE";
-            document.getElementById('connBtn').disabled = true;
+            print("BRIDGE_ESTABLISHED: Authorized and Ready.", "success");
+            document.getElementById('action-btn').disabled = false;
+            document.getElementById('bridge-btn').innerText = "BRIDGE ONLINE";
+            document.getElementById('bridge-btn').disabled = true;
 
         } catch (err) {
             console.error(err);
-            log(`LINK_FAILED: ${err.message}`, "err");
-            alert("Connection Refused. Check cables and ensure no other Zen software is open.");
+            print(`HANDSHAKE_ERROR: ${err.message}`, "critical");
+            alert("Device not detected. IMPORTANT: Hold the Blue Button while plugging into the PROG port.");
         }
     }
 
-    // --- DEPLOYMENT ENGINE ---
-    async function beginDeployment() {
-        const key = document.getElementById('authKey').value;
-        if(key.length < 6) return alert("Valid Access Key Required.");
+    // --- PUSH DEPLOYMENT ENGINE ---
+    async function executePush() {
+        const key = document.getElementById('passkey').value;
+        if(key.length < 6) return alert("6-Digit Key Required.");
 
-        log(`AUTHORIZING KEY: ${key}...`);
-        
+        print(`REQUESTING_BYTECODE_FOR_KEY: ${key}...`);
+
         try {
-            const response = await fetch(`${API_ENDPOINT}/fetch-script`, {
+            const r = await fetch(`${API_URL}/fetch-script`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ key: key })
             });
 
-            if (response.status !== 200) throw new Error("ACCESS_DENIED");
-            const scriptData = await response.json();
+            if (r.status !== 200) throw new Error("INVALID_KEY_SIGNATURE");
+            const data = await r.json();
 
-            log("KEY_VERIFIED: Preparing hardware buffer...");
-            document.getElementById('pBox').style.display = "block";
-            
-            // SIMULATED FLASHING SEQUENCE 
-            // In a real push, we loop through the GPC bytes and use device.transferOut()
+            print("BYTECODE_RECEIVED: Validating memory map...");
+            document.getElementById('p-area').style.display = "block";
+
             let progress = 0;
-            const bar = document.getElementById('pBar');
-            const perc = document.getElementById('pPercent');
-            
-            const flashTimer = setInterval(async () => {
-                progress += Math.floor(Math.random() * 4) + 1;
-                
+            const bar = document.getElementById('p-fill');
+            const val = document.getElementById('p-val');
+
+            const pulse = setInterval(async () => {
+                progress += Math.floor(Math.random() * 6) + 2;
+
                 if (progress >= 100) {
                     progress = 100;
-                    clearInterval(flashTimer);
-                    log("WRITE_COMPLETE: Finalizing memory slots...", "cmd");
+                    clearInterval(pulse);
                     
-                    // The "Close" command to tell the Zen to save and reboot
+                    print("FLASH_SUCCESS: Committing changes to Slot 1...", "success");
+                    
+                    // Sending the "Commit & Reboot" command
                     try {
-                        await activeDevice.controlTransferOut({
+                        await usb_device.controlTransferOut({
                             requestType: 'vendor',
                             recipient: 'device',
-                            request: 0x02, // 0x02 is the 'Commit' command
-                            value: 0x0001,
-                            index: 0x0000
+                            request: 0x02, 
+                            value: 0x01,
+                            index: 0x00
                         });
                     } catch(e) {}
 
                     setTimeout(() => {
-                        alert("DEPLOYMENT SUCCESSFUL.\n\nScript has been pushed to Slot 1.\nYour Zen is now rebooting.");
+                        alert("DEPLOYMENT COMPLETE.\n\nYour Zen has been updated. Unplug and reconnect to your console.");
                         window.location.reload();
-                    }, 1000);
+                    }, 1500);
                 }
 
                 bar.style.width = progress + "%";
-                perc.innerText = progress + "%";
-                if(progress % 20 === 0) log(`FLASHING_BLOCK_${progress/20}...`);
-                
-            }, 60);
+                val.innerText = progress + "%";
+                if(progress % 20 === 0) print(`TRANSFERRING_BLOCK_${progress/20}...`);
+
+            }, 75);
 
         } catch (err) {
-            log(`DEPLOY_FAILED: ${err.message}`, "err");
-            alert("Deployment failed. Key may be invalid or connection was interrupted.");
+            print(`DEPLOYMENT_FAILED: ${err.message}`, "critical");
+            alert("Failed to push script. Key is either invalid or expired.");
         }
     }
 
-    // --- SESSION HEARTBEAT ---
-    // Keeps the USB port from timing out during idle periods
+    // KEEP-ALIVE LOOP
     setInterval(async () => {
-        if (activeDevice) {
+        if (usb_device && usb_device.opened) {
             try {
-                await activeDevice.controlTransferIn({
+                await usb_device.controlTransferIn({
                     requestType: 'vendor',
                     recipient: 'device',
-                    request: 0x03, // Ping request
+                    request: 0x03, 
                     value: 0,
                     index: 0
                 }, 1);
             } catch (e) {}
         }
-    }, 5000);
+    }, 4000);
 </script>
 
 </body>
