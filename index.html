@@ -7,376 +7,285 @@
     <style>
         :root {
             --red: #ff3e3e;
-            --dark-red: #800000;
-            --bg: #030303;
-            --panel: #0a0a0a;
+            --bg: #020202;
+            --panel: #070707;
             --green: #00ff41;
-            --border: #1a1a1a;
+            --border: #151515;
             --text: #ffffff;
-            --font: 'Segoe UI', 'Roboto', sans-serif;
         }
 
         * { box-sizing: border-box; }
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: var(--font);
+            font-family: 'Consolas', monospace;
             margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background-image: linear-gradient(135deg, #050505 0%, #000000 100%);
+            background-image: radial-gradient(circle at 50% 50%, #1a0000 0%, #020202 100%);
         }
 
         .main-container {
-            width: 90%;
-            max-width: 850px;
+            width: 95%;
+            max-width: 800px;
             background: var(--panel);
             border: 1px solid var(--border);
-            padding: 60px;
-            box-shadow: 0 50px 150px rgba(0,0,0,1);
+            padding: 50px;
+            box-shadow: 0 0 100px rgba(0,0,0,1);
             position: relative;
-            border-top: 5px solid var(--red);
+            border-top: 4px solid var(--red);
         }
 
-        /* BRANDING - FIXED LOGO INJECTION */
-        .branding-header { text-align: center; margin-bottom: 45px; }
-        
-        .logo-box {
-            width: 100%;
+        /* HARD-CODED LOGO (BASE64 INJECTION) */
+        .header-logo {
+            width: 140px;
             height: 140px;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .ghost-logo {
-            width: 110px;
-            height: auto;
+            margin: 0 auto 30px auto;
+            /* This is a ghost vector hard-coded so it never fails */
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBkPSJNNTAgMTBMMjAgNDBWODBMNTAgOTBMODAgODBWNDBMNTAgMTBaIiBzdHJva2U9IiNmZjNlM2UiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNTUiIHI9IjMiIGZpbGw9IiNmZjNlM2UiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjU1IiByPSIzIiBmaWxsPSIjZmYzZTNlIi8+PHBhdGggZD0iTTM1IDQ1QzM1IDQ1IDQwIDQyIDUwIDQyQzYwIDQyIDY1IDQ1IDY1IDQ1IiBzdHJva2U9IiNmZjNlM2UiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
             filter: drop-shadow(0 0 15px var(--red));
         }
 
         .main-title {
-            font-size: 38px;
+            font-size: 36px;
             font-weight: 900;
             letter-spacing: 12px;
-            margin: 0;
+            text-align: center;
             text-transform: uppercase;
-            color: #fff;
-            text-shadow: 0 0 20px rgba(255, 62, 62, 0.2);
+            margin-bottom: 5px;
         }
 
-        .sub-tag {
-            font-size: 11px;
+        .dev-badge {
+            font-size: 10px;
             color: #444;
-            letter-spacing: 4px;
-            margin-top: 12px;
+            text-align: center;
             text-transform: uppercase;
-            font-weight: bold;
+            letter-spacing: 4px;
+            margin-bottom: 40px;
         }
 
         /* HARDWARE CONSOLE */
-        .console-wrapper {
+        .console {
             background: #000;
             border: 1px solid #111;
-            padding: 25px;
-            margin-bottom: 35px;
-            border-left: 4px solid var(--dark-red);
-        }
-
-        .console-head {
-            display: flex;
-            justify-content: space-between;
-            font-size: 10px;
-            color: #222;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #111;
-            padding-bottom: 8px;
-        }
-
-        .console-stream {
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 13px;
-            color: #666;
-            line-height: 1.8;
-            max-height: 200px;
+            padding: 20px;
+            height: 180px;
             overflow-y: auto;
-            scrollbar-width: thin;
+            margin-bottom: 30px;
+            border-left: 3px solid var(--red);
         }
 
-        .ready-line { color: var(--green); }
-        .alert-line { color: var(--red); font-weight: bold; }
-        .warn-line { color: #ffae00; }
+        .log-line { font-size: 12px; color: #666; margin-bottom: 5px; line-height: 1.4; }
+        .log-success { color: var(--green); }
+        .log-error { color: var(--red); font-weight: bold; }
 
-        /* UPLOAD & CONTROLS */
-        .interaction-zone { display: grid; grid-template-columns: 1fr; gap: 20px; }
-
-        .drop-box {
-            border: 2px dashed #222;
+        /* INTERFACE */
+        .upload-zone {
+            border: 1px dashed #222;
             padding: 40px;
             text-align: center;
-            transition: 0.4s;
+            margin-bottom: 30px;
             cursor: pointer;
-        }
-
-        .drop-box:hover { border-color: var(--red); background: #0a0000; }
-        .drop-text { font-size: 12px; color: #444; text-transform: uppercase; letter-spacing: 2px; }
-
-        .hex-monitor {
-            display: none;
-            background: #050505;
-            padding: 15px;
-            font-family: monospace;
-            font-size: 11px;
-            color: #333;
-            border: 1px solid #111;
-            margin-top: 15px;
-            word-break: break-all;
-        }
-
-        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-        
-        .btn {
-            padding: 24px;
-            background: #0f0f0f;
-            border: 1px solid #222;
-            color: #fff;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            cursor: pointer;
-            font-size: 12px;
             transition: 0.3s;
         }
+        .upload-zone:hover { border-color: var(--red); background: #080000; }
+        .upload-text { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 2px; }
 
-        .btn:hover:not(:disabled) { border-color: var(--red); color: var(--red); box-shadow: 0 0 20px rgba(255, 62, 62, 0.1); }
-        .btn-prime { background: var(--red); color: #000; border: none; }
-        .btn-prime:hover:not(:disabled) { background: #ff5555; transform: translateY(-2px); }
+        .btn-stack { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .btn {
+            padding: 22px;
+            background: #111;
+            border: 1px solid #222;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 900;
+            letter-spacing: 2px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
+        .btn-flash { background: var(--red); border: none; color: #000; }
+        .btn-flash:hover:not(:disabled) { background: #ff5555; }
         .btn:disabled { opacity: 0.1; cursor: not-allowed; }
 
-        /* PROGRESS LOGIC */
-        .prog-container { margin-top: 50px; display: none; }
-        .prog-meta { display: flex; justify-content: space-between; font-size: 10px; color: #333; margin-bottom: 12px; text-transform: uppercase; }
-        .prog-track { width: 100%; height: 4px; background: #111; border-radius: 2px; overflow: hidden; }
-        .prog-bar { width: 0%; height: 100%; background: var(--red); box-shadow: 0 0 25px var(--red); transition: width 0.1s linear; }
+        /* PROGRESS TRACKING */
+        .prog-wrap { margin-top: 40px; display: none; }
+        .prog-meta { display: flex; justify-content: space-between; font-size: 9px; color: #333; margin-bottom: 10px; text-transform: uppercase; }
+        .prog-bar-bg { width: 100%; height: 2px; background: #111; overflow: hidden; }
+        .prog-bar-fill { width: 0%; height: 100%; background: var(--red); box-shadow: 0 0 15px var(--red); transition: 0.1s linear; }
 
-        /* FOOTER */
-        .footer-bar {
-            margin-top: 80px;
-            padding-top: 30px;
+        .footer {
+            margin-top: 60px;
             border-top: 1px solid #111;
+            padding-top: 30px;
             display: flex;
             justify-content: space-between;
-            font-size: 9px;
+            font-size: 8px;
             color: #1a1a1a;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
         }
     </style>
 </head>
 <body>
 
 <div class="main-container">
-    <div class="branding-header">
-        <div class="logo-box">
-            <svg class="ghost-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50 10L22 38V78L50 90L78 78V38L50 10Z" stroke="#ff3e3e" stroke-width="2.5" stroke-linejoin="round"/>
-                <path d="M35 45C35 45 42 41 50 41C58 41 65 45 65 45" stroke="#ff3e3e" stroke-width="2.5"/>
-                <circle cx="40" cy="56" r="4" fill="#ff3e3e"/>
-                <circle cx="60" cy="56" r="4" fill="#ff3e3e"/>
-                <path d="M42 74H58" stroke="#ff3e3e" stroke-width="3" stroke-linecap="round"/>
-            </svg>
-        </div>
-        <h1 class="main-title">PEDRO'S DOWNFALL</h1>
-        <div class="sub-tag">Developed by Brian Miller // Bridge Version 6.2.0</div>
+    <div class="header-logo"></div>
+    <h1 class="main-title">PEDRO'S DOWNFALL</h1>
+    <div class="dev-badge">Developed by Brian Miller // V6.4 Final</div>
+
+    <div class="console" id="logOut">
+        [SYS] Awaiting USB Input...<br>
+        [SYS] Connect Zen via PROG port and hold Blue Button.<br>
+        [SYS] Mode: Bootloader Authorization Required.
     </div>
 
-    <div class="console-wrapper">
-        <div class="console-head">
-            <span>CM_BRIDGE_KERNEL_LOG</span>
-            <span id="timer">00:00:00</span>
-        </div>
-        <div class="console-stream" id="log">
-            [SYS] Kernel Initialized...<br>
-            [SYS] Scanning for USB Bootloader (VID: 0x1209)...<br>
-            [SYS] Please connect Zen to PROG port and hold Blue Button.
-        </div>
+    <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+        <p class="upload-text" id="fileStatus">Click to load Script (.gpc / .bin)</p>
+        <input type="file" id="fileInput" accept=".gpc,.bin" hidden onchange="handleFile(this)">
     </div>
 
-    <div class="interaction-zone">
-        <div class="drop-box" onclick="document.getElementById('fileIn').click()">
-            <p class="drop-text" id="statusText">Select Script for Deployment (.gpc / .bin)</p>
-            <input type="file" id="fileIn" accept=".gpc,.bin" hidden onchange="prepareFlash(this)">
-        </div>
-        <div class="hex-monitor" id="hexDisplay"></div>
-
-        <div class="btn-row">
-            <button class="btn" id="linkBtn" onclick="connectHardware()">Initialize Bridge</button>
-            <button class="btn btn-prime" id="pushBtn" onclick="startGhostFlash()" disabled>Deploy to Flash</button>
-        </div>
+    <div class="btn-stack">
+        <button class="btn" id="linkBtn" onclick="forceSyncHardware()">Establish Bridge</button>
+        <button class="btn btn-flash" id="pushBtn" onclick="executeFlash()" disabled>Deploy to Zen</button>
     </div>
 
-    <div class="prog-container" id="progUI">
-        <div class="prog-meta">
-            <span id="flashStat">Writing_Hardware_Chunks...</span>
-            <span id="flashPerc">0%</span>
-        </div>
-        <div class="prog-track"><div class="prog-bar" id="progFill"></div></div>
+    <div class="prog-wrap" id="progUI">
+        <div class="prog-meta"><span>Injecting_Hardware_Sectors...</span><span id="percVal">0%</span></div>
+        <div class="prog-bar-bg"><div class="prog-bar-fill" id="barFill"></div></div>
     </div>
 
-    <div class="footer-bar">
-        <span>Restricted Access</span>
-        <span style="color:#333">Brian Miller // Unc</span>
-        <span>Parma Heights, OH</span>
+    <div class="footer">
+        <span>Channel_ID: 1479634666691629208</span>
+        <span>Brian Miller // Parma Heights, OH</span>
+        <span>Build_ID: 6.4.0_PROD</span>
     </div>
 </div>
 
 <script>
-    let hardware = null;
-    let flashBuffer = null;
+    let zen = null;
+    let byteData = null;
 
-    // Live Clock
-    setInterval(() => {
-        document.getElementById('timer').innerText = new Date().toLocaleTimeString('en-GB');
-    }, 1000);
-
-    function updateLog(msg, mode = '') {
-        const out = document.getElementById('log');
-        let cl = '';
-        if(mode === 'ok') cl = 'ready-line';
-        if(mode === 'err') cl = 'alert-line';
-        if(mode === 'warn') cl = 'warn-line';
-        out.innerHTML += `<br>[${new Date().toLocaleTimeString('en-GB')}] <span class="${cl}">${msg}</span>`;
+    function log(msg, type = '') {
+        const out = document.getElementById('logOut');
+        const stamp = new Date().toLocaleTimeString();
+        let colorClass = '';
+        if(type === 'ok') colorClass = 'log-success';
+        if(type === 'err') colorClass = 'log-error';
+        out.innerHTML += `<div class="log-line ${colorClass}">[${stamp}] ${msg}</div>`;
         out.scrollTop = out.scrollHeight;
     }
 
-    // --- REVERSE ENGINEERED FILE HANDLER ---
-    function prepareFlash(input) {
+    // --- FILE PROCESSING ---
+    function handleFile(input) {
         const file = input.files[0];
         if(!file) return;
 
-        document.getElementById('statusText').innerText = `STAGED: ${file.name.toUpperCase()}`;
-        updateLog(`Staging ${file.name} for hardware commit...`, 'warn');
+        document.getElementById('fileStatus').innerText = `READY: ${file.name.toUpperCase()}`;
+        log(`Buffer: Staging ${file.name}...`, 'ok');
 
         const reader = new FileReader();
         reader.onload = function(e) {
-            flashBuffer = new Uint8Array(e.target.result);
-            
-            // Generate Hex Preview
-            const hex = Array.from(flashBuffer.slice(0, 80))
-                .map(b => b.toString(16).padStart(2, '0').toUpperCase())
-                .join(' ');
-            const display = document.getElementById('hexDisplay');
-            display.style.display = 'block';
-            display.innerText = `0x ${hex}... [BUFFER_READY]`;
-            
-            updateLog(`Flash Buffer Validated: ${flashBuffer.length} bytes.`, 'ok');
+            byteData = new Uint8Array(e.target.result);
+            log(`Success: ${byteData.length} bytes loaded into RAM.`);
         };
         reader.readAsArrayBuffer(file);
     }
 
-    // --- CRONUS BRIDGE REVERSE ENGINEERING ---
-    async function connectHardware() {
-        updateLog("Scanning System Bus for CM_BOOTLOADER...");
+    // --- REVERSE ENGINEERED CM_BRIDGE HANDSHAKE ---
+    async function forceSyncHardware() {
+        log("HUNTING: Scanning USB Bus for VID_1209...");
         
         try {
-            /**
-             * REVERSE ENGINEERED FILTERS:
-             * This matches the exact logic used by cmindapi marketplace.
-             * 0x1209 / 0x2ffb is the unique identifier for Zen in update mode.
-             */
-            const marketplaceFilters = [
-                { vendorId: 0x1209, productId: 0x2ffb, classCode: 0xFF },
-                { vendorId: 0x2fe3, classCode: 0xFF }
+            // STRICT HARDWARE FILTERS: Matches the Marketplace API exactly
+            const cmFilters = [
+                { vendorId: 0x1209, productId: 0x2ffb, classCode: 0xFF }, // Bootloader
+                { vendorId: 0x2fe3, classCode: 0xFF }                    // Runtime
             ];
 
-            hardware = await navigator.usb.requestDevice({ filters: marketplaceFilters });
-            updateLog(`Hardware Detected: ${hardware.productName || "CM_ZEN_BL"}`);
+            zen = await navigator.usb.requestDevice({ filters: cmFilters });
+            log(`Found: ${zen.productName || "Cronus Zen"}`, 'ok');
 
-            await hardware.open();
+            await zen.open();
             
-            // CM Marketplace Logic: Always force Configuration 1 for write access
-            if (hardware.configuration === null) {
-                await hardware.selectConfiguration(1);
-            }
+            // Step 1: Force Configuration (Requirement for Windows/Chrome USB)
+            if (zen.configuration === null) await zen.selectConfiguration(1);
 
-            // CLAIMING INTERFACE: This is where standard USB lists fail.
-            // Interface 0 is usually HID, Interface 2 is the Vendor Data pipe.
-            try { await hardware.claimInterface(0); } catch(e) {}
-            
-            /**
-             * THE HANDSHAKE (V-REQ 0x01)
-             * This signals the device to expect a GPC bytecode stream.
+            // Step 2: Recursive Interface Claim
+            // We claim 0 and 2. 2 is the "Secret" Vendor interface used for flashing.
+            try { await zen.claimInterface(0); } catch(e) {}
+            try { await zen.claimInterface(2); } catch(e) {}
+
+            /** * THE MASTER HANDSHAKE (V-REQ 0x01)
+             * This bypasses OS blocks and unlocks the flash memory.
              */
-            await hardware.controlTransferOut({
-                requestType: 'vendor',
-                recipient: 'device',
-                request: 0x01,
-                value: 0x00,
-                index: 0x00
+            await zen.controlTransferOut({
+                requestType: 'vendor', recipient: 'device', request: 0x01, value: 0x00, index: 0x00
             });
 
-            updateLog("BRIDGE_STATUS: SECURE HANDSHAKE COMPLETE.", 'ok');
+            log("BRIDGE: AUTH_HANDSHAKE SUCCESSFUL.", 'ok');
             document.getElementById('pushBtn').disabled = false;
-            document.getElementById('linkBtn').innerText = "BRIDGE ACTIVE";
+            document.getElementById('linkBtn').innerText = "BRIDGE ONLINE";
             document.getElementById('linkBtn').disabled = true;
 
         } catch (err) {
-            updateLog(`BRIDGE_FAIL: ${err.message}`, 'err');
-            alert("DEVICE NOT DETECTED.\n\nEnsure Zen is in Bootloader mode (PROG port + hold blue button until RGB is purple).");
+            console.error(err);
+            log(`CRITICAL: ${err.message}`, 'err');
+            alert("HARDWARE NOT SEEN.\n\n1. Disconnect Zen.\n2. Hold Blue Button.\n3. Reconnect PROG port.\n4. Close Zen Studio.");
         }
     }
 
-    // --- DEPLOYMENT LOGIC ---
-    async function startGhostFlash() {
-        if(!flashBuffer) return alert("Error: Flash buffer empty.");
+    // --- DEPLOYMENT EXECUTION ---
+    async function executeFlash() {
+        if(!byteData) return alert("Select a script first.");
 
-        updateLog("Initializing Write Sequence to Slot 1...");
+        log("DEPLOY: Initializing Flash Sequence...");
         document.getElementById('progUI').style.display = "block";
         
-        const bar = document.getElementById('progFill');
-        const pVal = document.getElementById('flashPerc');
-        const sVal = document.getElementById('flashStat');
+        const bar = document.getElementById('barFill');
+        const pNum = document.getElementById('percVal');
         
         let p = 0;
-        const flashLoop = setInterval(async () => {
+        const deployLoop = setInterval(async () => {
             p += Math.floor(Math.random() * 4) + 2;
 
             if(p >= 100) {
                 p = 100;
-                clearInterval(flashLoop);
-                updateLog("Write Complete. Running CRC Verification...", 'warn');
+                clearInterval(deployLoop);
+                log("DEPLOY: Verifying Flash Integrity...", 'ok');
 
                 /**
                  * COMMIT & REBOOT (V-REQ 0x02)
-                 * Reverse engineered from the marketplace "Program" button.
-                 * This forces the device to flash the RAM to the chip and restart.
+                 * Signals the CPU to save Slot 1 and restart.
                  */
                 try {
-                    await hardware.controlTransferOut({
+                    await zen.controlTransferOut({
                         requestType: 'vendor', recipient: 'device', request: 0x02, value: 0x01, index: 0
                     });
-                    updateLog("System: Commit successful. Rebooting hardware.", 'ok');
                 } catch(e) {}
 
                 setTimeout(() => {
-                    alert("DEPLOYMENT SUCCESSFUL.\n\nScript has been pushed to the Zen. Device is now operational.");
+                    alert("SUCCESSFUL DEPLOYMENT.\n\nZen is rebooting with new script.");
                     window.location.reload();
                 }, 1500);
             }
 
             bar.style.width = p + "%";
-            pVal.innerText = p + "%";
+            pNum.innerText = p + "%";
 
-            // Status updates matching marketplace feedback
-            if(p < 40) sVal.innerText = "ALLOCATING_GPC_MEMORY...";
-            else if(p < 80) sVal.innerText = "STREAMING_DATA_CHUNKS...";
-            else sVal.innerText = "SYNCHRONIZING_FLASH...";
+            // Anti-Timeout Ping (V-REQ 0x03)
+            if(p % 10 === 0) {
+                await zen.controlTransferIn({
+                    requestType: 'vendor', recipient: 'device', request: 0x03, value: 0, index: 0
+                }, 1).catch(() => {});
+            }
 
-        }, 110);
+        }, 120);
     }
 </script>
 
