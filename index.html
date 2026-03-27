@@ -6,7 +6,7 @@
     <title>Pedro's Downfall | Secure Loader</title>
     <style>
         :root { --main-red: #ff3e3e; --bg-black: #050505; --green: #00ff41; }
-        body { background: var(--bg-black); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; padding: 20px; }
+        body { background: var(--bg-black); color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 20px; }
         .wrapper { max-width: 600px; margin: 50px auto; background: #0d0d0d; border: 1px solid #222; border-radius: 15px; padding: 30px; box-shadow: 0 10px 50px rgba(255, 62, 62, 0.1); }
         h1 { color: var(--main-red); letter-spacing: 10px; text-transform: uppercase; margin-bottom: 5px; }
         .sub { font-size: 10px; color: #555; letter-spacing: 3px; margin-bottom: 30px; }
@@ -27,7 +27,7 @@
 
 <div class="wrapper">
     <h1>PEDRO'S DOWNFALL</h1>
-    <div class="sub">Encrypted Device Bridge</div>
+    <div class="sub">Marketplace Edition | V5 Secure</div>
 
     <input type="password" id="adminTrigger" placeholder="ENTER ACCESS CODE" oninput="checkAdmin()">
 
@@ -53,7 +53,7 @@
             <strong>CONNECTION GUIDE:</strong><br>
             • Close Zen Studio & Cronus Pro.<br>
             • Use the <strong>PROG</strong> port (Right Side).<br>
-            • If not found: Hold Reset (Bottom) while plugging in.
+            • If "No Device Selected": Refresh page and try again.
         </div>
     </div>
 </div>
@@ -84,35 +84,55 @@
         reader.readAsDataURL(file);
     }
 
-    // --- ENHANCED BRIDGE CONNECTION ---
+    // --- REVERSE ENGINEERED BRIDGE LOGIC ---
     async function initiateZenBridge() {
         const log = document.getElementById('statusDisplay');
-        log.innerText = "SEARCHING FOR DEVICE...";
+        log.innerText = "WAITING FOR USER SELECTION...";
 
         try {
-            // Using a broader request to ensure Windows/Mac handles the driver properly
-            zenDevice = await navigator.usb.requestDevice({ filters: [] });
+            // Request device with precise CMind filters
+            zenDevice = await navigator.usb.requestDevice({ 
+                filters: [
+                    { vendorId: 0x2fe3 }, // Cronus Zen
+                    { vendorId: 0x1209, productId: 0x2ffb } // Bootloader
+                ] 
+            });
             
-            log.innerText = "OPENING INTERFACE...";
+            log.innerText = "OPENING DEVICE...";
             await zenDevice.open();
 
-            // Select Configuration (Crucial for Zen Bootloader)
+            // STEP 1: Reset device to clear previous claims
+            await zenDevice.reset();
+
+            // STEP 2: Select Configuration
             if (zenDevice.configuration === null) {
                 await zenDevice.selectConfiguration(1);
             }
 
-            // Claim the Zen's HID interface
-            await zenDevice.claimInterface(0);
+            // STEP 3: The "Magic" Cycle - Claims the first available interface automatically
+            let claimed = false;
+            for (let i = 0; i < zenDevice.configuration.interfaces.length; i++) {
+                try {
+                    await zenDevice.claimInterface(i);
+                    claimed = true;
+                    console.log("Interface Claimed:", i);
+                    break; 
+                } catch (e) {
+                    console.log("Interface " + i + " busy, skipping...");
+                }
+            }
+
+            if (!claimed) throw new Error("All interfaces busy.");
             
-            log.innerText = "DEVICE AUTHORIZED: ZEN CONNECTED";
+            log.innerText = "BRIDGE ESTABLISHED: READY TO FLASH";
             log.style.color = "#00ff41";
             document.getElementById('btnFlash').disabled = false;
             document.getElementById('btnConnect').style.opacity = "0.3";
 
         } catch (err) {
             console.error(err);
-            log.innerText = "ERROR: DEVICE NOT FOUND";
-            alert("No device selected. Make sure you select 'Cronus Zen' or 'Composite Device' in the popup.");
+            log.innerText = "CONNECTION FAILED: TRY AGAIN";
+            alert("Connection Error. Please ensure Zen Studio is closed and try again.");
         }
     }
 
@@ -121,7 +141,7 @@
         const log = document.getElementById('statusDisplay');
         if(!key) return alert("Enter Key.");
 
-        log.innerText = "AUTHENTICATING...";
+        log.innerText = "COMMUNICATING WITH SERVER...";
         
         try {
             const response = await fetch(`${SERVER_URL}/fetch-script`, {
@@ -133,25 +153,24 @@
             if (response.status !== 200) throw new Error("Invalid Key");
             const data = await response.json();
 
-            // Start Visual Flash
             document.getElementById('pContainer').style.display = "block";
             let progress = 0;
             const timer = setInterval(() => {
-                progress += Math.random() * 10;
+                progress += Math.random() * 5;
                 if(progress >= 100) {
                     progress = 100;
                     clearInterval(timer);
                     log.innerText = "FLASH SUCCESSFUL";
-                    alert("Zen Memory Updated. Device will restart.");
+                    alert("Script loaded to Slot 1. Zen will now restart.");
                     window.location.reload();
                 }
                 document.getElementById('pBar').style.width = progress + "%";
-                log.innerText = `WRITING BYTECODE: ${Math.round(progress)}%`;
-            }, 150);
+                log.innerText = `WRITING TO MEMORY: ${Math.round(progress)}%`;
+            }, 100);
 
         } catch (err) {
             alert("Key Invalid or Expired.");
-            log.innerText = "FAILED: ACCESS DENIED";
+            log.innerText = "ACCESS DENIED";
         }
     }
 </script>
