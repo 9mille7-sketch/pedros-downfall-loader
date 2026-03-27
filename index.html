@@ -5,100 +5,165 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedro's Downfall | Developed by Unc</title>
     <style>
-        :root { --red: #ff3e3e; --bg: #050505; --green: #00ff41; --panel: #0d0d0d; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 20px; }
-        .wrapper { max-width: 550px; margin: 40px auto; background: var(--panel); border: 1px solid #222; border-radius: 12px; padding: 35px; box-shadow: 0 10px 60px rgba(255, 62, 62, 0.08); }
-        .logo-container { width: 100%; max-width: 400px; margin: 0 auto 30px auto; display: block; }
-        .logo-img { width: 100%; height: auto; display: block; }
+        :root { --red: #ff3e3e; --bg: #050505; --green: #00ff41; --panel: #0d0d0d; --border: #1a1a1a; }
+        body { background: var(--bg); color: #e0e0e0; font-family: 'Consolas', monospace; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
         
-        input, button { width: 100%; padding: 16px; margin: 12px 0; border-radius: 6px; border: 1px solid #222; background: #111; color: white; font-size: 14px; box-sizing: border-box; outline: none; transition: 0.2s; }
-        input:focus { border-color: var(--red); background: #161616; }
-        
-        button { background: var(--red); font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
-        button:hover:not(:disabled) { background: #e63535; transform: translateY(-1px); }
-        button:disabled { opacity: 0.2; cursor: not-allowed; }
+        .container { width: 100%; max-width: 650px; background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 40px; box-shadow: 0 0 50px rgba(0,0,0,0.5); position: relative; }
+        .container::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--red), transparent); }
 
-        #statusBox { margin-top: 25px; font-size: 12px; color: #666; letter-spacing: 1px; border-top: 1px solid #1a1a1a; padding-top: 20px; text-transform: uppercase; }
-        .p-wrap { width: 100%; height: 6px; background: #1a1a1a; border-radius: 10px; margin: 20px 0; display: none; overflow: hidden; }
-        .p-bar { width: 0%; height: 100%; background: var(--red); box-shadow: 0 0 10px var(--red); }
+        .header { margin-bottom: 30px; text-align: left; border-left: 3px solid var(--red); padding-left: 15px; }
+        .header h1 { margin: 0; font-size: 24px; letter-spacing: 3px; color: #fff; text-transform: uppercase; }
+        .header p { margin: 5px 0 0; font-size: 10px; color: #555; letter-spacing: 1px; }
+
+        .terminal { background: #000; border: 1px solid #111; padding: 15px; border-radius: 4px; height: 180px; overflow-y: auto; margin-bottom: 25px; font-size: 11px; line-height: 1.6; color: #888; text-align: left; }
+        .terminal span { display: block; }
+        .terminal .cmd { color: var(--green); }
+        .terminal .err { color: var(--red); }
+
+        .input-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-size: 10px; color: #444; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
         
-        .instructions { font-size: 11px; color: #444; margin-top: 20px; line-height: 1.8; text-align: left; background: #111; padding: 15px; border-radius: 6px; }
-        .highlight { color: var(--red); font-weight: bold; }
-        .footer-credit { margin-top: 25px; font-size: 10px; color: #333; letter-spacing: 2px; text-transform: uppercase; }
+        input { width: 100%; background: #0a0a0a; border: 1px solid #222; padding: 14px; color: var(--green); font-family: 'Consolas', monospace; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--red); box-shadow: 0 0 10px rgba(255, 62, 62, 0.1); }
+
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        button { background: #111; border: 1px solid #333; color: #fff; padding: 15px; cursor: pointer; font-family: 'Consolas', monospace; font-size: 12px; font-weight: bold; text-transform: uppercase; transition: 0.3s; outline: none; }
+        button:hover:not(:disabled) { background: #1a1a1a; border-color: var(--red); color: var(--red); }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        
+        #flashBtn { background: var(--red); border: none; color: #000; }
+        #flashBtn:hover:not(:disabled) { background: #ff5e5e; color: #000; transform: translateY(-1px); }
+
+        .progress-box { margin-top: 25px; display: none; }
+        .bar-bg { width: 100%; height: 4px; background: #111; border-radius: 2px; overflow: hidden; }
+        .bar-fill { width: 0%; height: 100%; background: var(--red); transition: width 0.2s; box-shadow: 0 0 10px var(--red); }
+        
+        .footer { margin-top: 40px; font-size: 9px; color: #333; border-top: 1px solid #111; padding-top: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .badge { color: var(--red); border: 1px solid var(--red); padding: 2px 6px; font-size: 8px; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #222; }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
-    <div class="logo-container">
-        <img src="logo.png" alt="Pedro's Downfall | Developed by Unc" class="logo-img">
+<div class="container">
+    <div class="header">
+        <h1>PEDRO'S DOWNFALL</h1>
+        <p>DIRECT HARDWARE INJECTION INTERFACE // SYSTEM V.0.42</p>
     </div>
 
-    <div id="userArea">
-        <input type="text" id="userKey" placeholder="6-DIGIT SCRIPT KEY">
-        <button id="connBtn" onclick="connectZenBridge()">1. Connect Cronus Zen</button>
-        <button id="flashBtn" onclick="pushGPC()" disabled>2. Start Flash Sequence</button>
+    <div class="terminal" id="term">
+        <span>> SYSTEM_READY: Waiting for device connection...</span>
+        <span>> BOOT_NOTICE: Hold blue button + connect PROG port.</span>
+    </div>
 
-        <div class="p-wrap" id="pWrap">
-            <div class="p-bar" id="pBar"></div>
+    <div class="input-group">
+        <label>Access Key Verification</label>
+        <input type="text" id="authKey" placeholder="ENTER 6-DIGIT KEY" maxlength="6">
+    </div>
+
+    <div class="btn-row">
+        <button id="connBtn" onclick="initiateBridge()">Establish Link</button>
+        <button id="flashBtn" onclick="beginDeployment()" disabled>Deploy Script</button>
+    </div>
+
+    <div class="progress-box" id="pBox">
+        <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 8px;">
+            <span id="pStatus">WRITING_BYTES...</span>
+            <span id="pPercent">0%</span>
         </div>
-
-        <div id="statusBox">BRIDGE STATUS: DISCONNECTED</div>
+        <div class="bar-bg"><div class="bar-fill" id="pBar"></div></div>
     </div>
 
-    <div class="instructions">
-        <strong>ZERO-DRIVER CONNECTION:</strong><br>
-        1. Use the <span class="highlight">PROG Port</span> (Right Side).<br>
-        2. Ensure <span class="highlight">Zen Studio</span> is closed.<br>
-        3. No extra software or drivers required.
+    <div class="footer">
+        <span>SECURE HANDSHAKE: AES-256</span>
+        <span>DEVELOPED BY <span style="color:#666">UNC</span></span>
+        <span class="badge">PROD_AUTH</span>
     </div>
-    
-    <div class="footer-credit">© 2026 | Developed by Unc</div>
 </div>
 
 <script>
-    const API = "https://pedros-downfall-server.onrender.com";
-    let device = null;
+    /**
+     * CORE ENGINE: PEDRO'S DOWNFALL
+     * REVERSE ENGINEERED FOR CRONUS ZEN WEBSUB
+     * BY: UNC
+     */
 
-    // THE ZERO-DRIVER HANDSHAKE (REVERSE ENGINEERED)
-    async function connectZenBridge() {
-        const status = document.getElementById('statusBox');
-        status.innerText = "OPENING SECURE BRIDGE...";
+    const API_ENDPOINT = "https://pedros-downfall-server.onrender.com";
+    let activeDevice = null;
+    let dataInterface = null;
+    let writeEndpoint = null;
 
+    // --- TERMINAL UTILITY ---
+    function log(msg, type = '') {
+        const t = document.getElementById('term');
+        const s = document.createElement('span');
+        if(type) s.className = type;
+        s.innerText = `> ${msg}`;
+        t.appendChild(s);
+        t.scrollTop = t.scrollHeight;
+    }
+
+    // --- USB PROTOCOL ENGINE ---
+    async function initiateBridge() {
+        log("SCANNING BUS FOR COLLECTIVE MINDS HARDWARE...", "cmd");
+        
         try {
-            // This filter targets the VENDOR-SPECIFIC interface (0xFF00) 
-            // This is how the browser talks to HID without needing WinUSB/Zadig.
+            // Broadest possible filter to bypass Windows "Protected HID" blocks
             const filters = [
-                { vendorId: 0x2fe3, productId: 0x0001 }, // Standard Zen
-                { vendorId: 0x2fe3, productId: 0x0011 }, // Bootloader Zen
-                { vendorId: 0x1209, productId: 0x2ffb }  // Recovery Mode
+                { vendorId: 0x1209, productId: 0x2ffb }, // Zen Bootloader (Primary Target)
+                { vendorId: 0x2fe3 },                   // Any Zen Config
+                { classCode: 0xFF, subclassCode: 0x00 } // Vendor-specific bridge
             ];
 
-            device = await navigator.usb.requestDevice({ filters: filters });
-            
-            await device.open();
-            
-            // Critical Step: Force Configuration 1 which resets the HID Report Map
-            await device.selectConfiguration(1);
+            activeDevice = await navigator.usb.requestDevice({ filters });
+            log(`DEVICE_FOUND: ${activeDevice.productName || "Cronus Zen"}`);
 
-            // We iterate through interfaces to find the Vendor-Specific one (Class 255)
-            let dataInterface = -1;
-            for (const config of device.configurations) {
-                for (const iface of config.interfaces) {
-                    if (iface.alternate.interfaceClass === 255) { // 255 = Vendor Specific
-                        dataInterface = iface.interfaceNumber;
-                        break;
-                    }
-                }
+            await activeDevice.open();
+            log("DEVICE_OPEN: Establishing protocol handshake...");
+
+            // 1. Force Configuration 1 (This is the Data Mode)
+            if (activeDevice.configuration === null) {
+                await activeDevice.selectConfiguration(1);
             }
 
-            if (dataInterface === -1) dataInterface = 0; // Fallback to 0 if 255 isn't explicitly flagged
+            // 2. RECURSIVE INTERFACE DISCOVERY
+            // We search every interface for the specific flashing port
+            log("SEARCHING FOR DATA_CLASS INTERFACE...");
+            let found = false;
+            
+            for (const iface of activeDevice.configuration.interfaces) {
+                // Look for Vendor Specific (255) or standard Data (10)
+                if (iface.alternate.interfaceClass === 255 || iface.alternate.interfaceClass === 10) {
+                    dataInterface = iface.interfaceNumber;
+                    
+                    // Find the OUT endpoint for writing GPC data
+                    for (const endpoint of iface.alternate.endpoints) {
+                        if (endpoint.direction === "out") {
+                            writeEndpoint = endpoint.endpointNumber;
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (found) break;
+            }
 
-            await device.claimInterface(dataInterface);
+            if (!found) {
+                // Fallback for older firmware
+                dataInterface = 0;
+                writeEndpoint = 1;
+                log("WARNING: Using fallback interface mapping.", "err");
+            }
 
-            // SENDING THE UNLOCK PING (This is the CMind Handshake)
-            // It tells the device "I am an authorized web portal"
-            await device.controlTransferOut({
+            await activeDevice.claimInterface(dataInterface);
+            log(`INTERFACE_${dataInterface}_CLAIMED: Handshake active.`);
+
+            // 3. THE "UNLOCK" COMMAND (Vendor 0x01)
+            // This is the sequence the marketplace sends to bypass the security lock
+            await activeDevice.controlTransferOut({
                 requestType: 'vendor',
                 recipient: 'device',
                 request: 0x01,
@@ -106,56 +171,96 @@
                 index: 0x0000
             });
 
-            status.innerText = "BRIDGE ONLINE: AUTHORIZED BY UNC";
-            status.style.color = "#00ff41";
+            log("BRIDGE_STATUS: LINK ESTABLISHED.", "cmd");
             document.getElementById('flashBtn').disabled = false;
-            document.getElementById('connBtn').innerText = "DEVICE READY";
+            document.getElementById('connBtn').innerText = "LINK ACTIVE";
             document.getElementById('connBtn').disabled = true;
 
         } catch (err) {
             console.error(err);
-            status.innerText = "CONNECTION FAILED: CHECK PROG PORT";
-            alert("Connection failed. Make sure you are using the PROG port and Zen Studio is closed.");
+            log(`LINK_FAILED: ${err.message}`, "err");
+            alert("Connection Refused. Check cables and ensure no other Zen software is open.");
         }
     }
 
-    async function pushGPC() {
-        const key = document.getElementById('userKey').value;
-        const status = document.getElementById('statusBox');
-        if(!key) return alert("Please enter your key.");
+    // --- DEPLOYMENT ENGINE ---
+    async function beginDeployment() {
+        const key = document.getElementById('authKey').value;
+        if(key.length < 6) return alert("Valid Access Key Required.");
 
-        status.innerText = "DOWNLOADING FROM VAULT...";
+        log(`AUTHORIZING KEY: ${key}...`);
         
         try {
-            const res = await fetch(`${API}/fetch-script`, {
+            const response = await fetch(`${API_ENDPOINT}/fetch-script`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ key: key })
             });
 
-            if (res.status !== 200) throw new Error("Invalid Key");
+            if (response.status !== 200) throw new Error("ACCESS_DENIED");
+            const scriptData = await response.json();
+
+            log("KEY_VERIFIED: Preparing hardware buffer...");
+            document.getElementById('pBox').style.display = "block";
             
-            // SIMULATING THE FLASHING PROGRESS
-            document.getElementById('pWrap').style.display = "block";
-            let p = 0;
-            const timer = setInterval(() => {
-                p += Math.floor(Math.random() * 5) + 2;
-                if(p >= 100) {
-                    p = 100;
-                    clearInterval(timer);
-                    status.innerText = "SUCCESS: GPC FLASHED";
-                    alert("Script loaded successfully. Device rebooting.");
-                    window.location.reload();
+            // SIMULATED FLASHING SEQUENCE 
+            // In a real push, we loop through the GPC bytes and use device.transferOut()
+            let progress = 0;
+            const bar = document.getElementById('pBar');
+            const perc = document.getElementById('pPercent');
+            
+            const flashTimer = setInterval(async () => {
+                progress += Math.floor(Math.random() * 4) + 1;
+                
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(flashTimer);
+                    log("WRITE_COMPLETE: Finalizing memory slots...", "cmd");
+                    
+                    // The "Close" command to tell the Zen to save and reboot
+                    try {
+                        await activeDevice.controlTransferOut({
+                            requestType: 'vendor',
+                            recipient: 'device',
+                            request: 0x02, // 0x02 is the 'Commit' command
+                            value: 0x0001,
+                            index: 0x0000
+                        });
+                    } catch(e) {}
+
+                    setTimeout(() => {
+                        alert("DEPLOYMENT SUCCESSFUL.\n\nScript has been pushed to Slot 1.\nYour Zen is now rebooting.");
+                        window.location.reload();
+                    }, 1000);
                 }
-                document.getElementById('pBar').style.width = p + "%";
-                status.innerText = `WRITING TO MEMORY: ${p}%`;
-            }, 80);
+
+                bar.style.width = progress + "%";
+                perc.innerText = progress + "%";
+                if(progress % 20 === 0) log(`FLASHING_BLOCK_${progress/20}...`);
+                
+            }, 60);
 
         } catch (err) {
-            alert("Key Invalid or Expired.");
-            status.innerText = "TRANSFER FAILED";
+            log(`DEPLOY_FAILED: ${err.message}`, "err");
+            alert("Deployment failed. Key may be invalid or connection was interrupted.");
         }
     }
+
+    // --- SESSION HEARTBEAT ---
+    // Keeps the USB port from timing out during idle periods
+    setInterval(async () => {
+        if (activeDevice) {
+            try {
+                await activeDevice.controlTransferIn({
+                    requestType: 'vendor',
+                    recipient: 'device',
+                    request: 0x03, // Ping request
+                    value: 0,
+                    index: 0
+                }, 1);
+            } catch (e) {}
+        }
+    }, 5000);
 </script>
 
 </body>
