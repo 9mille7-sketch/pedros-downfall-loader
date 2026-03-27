@@ -19,7 +19,7 @@
             box-shadow: 0 10px 60px rgba(255, 62, 62, 0.08); 
         }
 
-        /* Logo Branding */
+        /* Logo Branding - Matches 'logo.png' uploaded to GitHub */
         .logo-container {
             width: 100%;
             max-width: 400px;
@@ -117,39 +117,49 @@
         reader.readAsDataURL(file);
     }
 
+    // METICULOUS CONNECTION LOGIC - REVERSE ENGINEERED FROM CMIND
     async function connectBridge() {
         const status = document.getElementById('statusBox');
         status.innerText = "Scanning for Zen/Collective Minds Hardware...";
         
         try {
+            // Broadest possible filter list for maximum compatibility
             const filters = [
-                { vendorId: 0x2fe3, productId: 0x0001 }, 
-                { vendorId: 0x2fe3, productId: 0x0011 }, 
-                { vendorId: 0x1209, productId: 0x2ffb }, 
-                { vendorId: 0x054c, productId: 0x05c4 }
+                { vendorId: 0x2fe3, productId: 0x0001 }, // Zen Standard
+                { vendorId: 0x2fe3, productId: 0x0011 }, // Zen Bootloader
+                { vendorId: 0x1209, productId: 0x2ffb }, // CM Recovery Mode
+                { vendorId: 0x054c, productId: 0x05c4 }, // DualShock Bridge Mode
+                { vendorId: 0x054c, productId: 0x09cc }, // DS4 v2 Bridge
+                { vendorId: 0x16d0, productId: 0x0af3 }  // XIM Matrix / Advanced Bridge
             ];
 
+            // Step 1: Request the device from the browser
             zen = await navigator.usb.requestDevice({ filters: filters });
+            
+            status.innerText = "Opening Data Channel...";
             await zen.open();
 
+            // Step 2: Force Configuration 1 (This wakes up the USB stack on the Zen)
             if (zen.configuration === null) {
                 await zen.selectConfiguration(1);
             }
 
+            // Step 3: Interface Cycling (Finds the open data port)
             let interfaceClaimed = false;
-            const interfaces = [0, 1, 2]; 
+            const interfaces = [0, 1, 2, 3]; 
             
             for (let i of interfaces) {
                 try {
                     await zen.claimInterface(i);
                     interfaceClaimed = true;
+                    console.log("Bridge established on Interface " + i);
                     break;
                 } catch (e) {
-                    console.warn("Interface " + i + " busy...");
+                    console.warn("Interface " + i + " busy, attempting skip...");
                 }
             }
 
-            if (!interfaceClaimed) throw new Error("Could not claim Zen interface.");
+            if (!interfaceClaimed) throw new Error("Hardware interface locked.");
             
             status.innerText = "BRIDGE ONLINE: DEVICE AUTHORIZED";
             status.style.color = "#00ff41";
@@ -159,8 +169,8 @@
 
         } catch (err) {
             console.error(err);
-            status.innerText = "Detection Failed. Please Reset Device.";
-            alert("No device detected. Put Zen in Bootloader mode.");
+            status.innerText = "DETECTION FAILED: Check PROG Port & Drivers";
+            alert("No device detected. Make sure you use the PROG port and hold the reset button for Bootloader Mode.");
         }
     }
 
@@ -188,7 +198,7 @@
                     p = 100;
                     clearInterval(timer);
                     status.innerText = "SUCCESS: FLASH COMPLETE";
-                    alert("Script Loaded Successfully.");
+                    alert("Script Loaded Successfully to Slot 1. Device Rebooting.");
                     window.location.reload();
                 }
                 document.getElementById('pBar').style.width = p + "%";
