@@ -3,174 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pedro's Downfall | Secure Loader</title>
+    <title>Pedro's Downfall | Developed by Unc</title>
     <style>
-        :root { --main-red: #ff3e3e; --bg-black: #050505; --green: #00ff41; }
-        body { background: var(--bg-black); color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 20px; }
-        .wrapper { max-width: 600px; margin: 50px auto; background: #0d0d0d; border: 1px solid #222; border-radius: 15px; padding: 30px; box-shadow: 0 10px 50px rgba(255, 62, 62, 0.1); }
-        h1 { color: var(--main-red); letter-spacing: 10px; text-transform: uppercase; margin-bottom: 5px; }
-        .sub { font-size: 10px; color: #555; letter-spacing: 3px; margin-bottom: 30px; }
+        :root { --red: #ff3e3e; --bg: #050505; --green: #00ff41; --panel: #0d0d0d; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 20px; }
         
-        input, button { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #111; color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
-        button { background: var(--main-red); font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; }
-        button:hover:not(:disabled) { background: #ff0000; transform: scale(1.01); }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        /* Branded Wrapper */
+        .wrapper { 
+            max-width: 550px; 
+            margin: 40px auto; 
+            background: var(--panel); 
+            border: 1px solid #222; 
+            border-radius: 12px; 
+            padding: 35px; 
+            box-shadow: 0 10px 60px rgba(255, 62, 62, 0.08); 
+        }
 
-        #adminPanel { display: none; margin: 20px 0; padding: 20px; border: 1px dashed var(--main-red); background: rgba(255, 62, 62, 0.05); }
-        #statusDisplay { margin-top: 20px; font-size: 13px; color: #888; border-top: 1px solid #222; padding-top: 20px; }
-        .progress-bg { width: 100%; height: 8px; background: #222; border-radius: 10px; margin: 20px 0; display: none; overflow: hidden; }
-        .progress-bar { width: 0%; height: 100%; background: var(--main-red); box-shadow: 0 0 15px var(--main-red); transition: width 0.3s ease; }
-        .hint-text { font-size: 11px; color: #444; margin-top: 15px; line-height: 1.6; }
+        /* Logo Branding */
+        .logo-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 30px auto;
+            display: block;
+        }
+        .logo-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        input, button { width: 100%; padding: 16px; margin: 12px 0; border-radius: 6px; border: 1px solid #222; background: #111; color: white; font-size: 14px; box-sizing: border-box; outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--red); background: #161616; }
+        
+        button { background: var(--red); font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        button:hover:not(:disabled) { background: #e63535; transform: translateY(-1px); }
+        button:disabled { opacity: 0.2; cursor: not-allowed; }
+
+        #adminArea { display: none; margin-bottom: 25px; padding: 20px; border: 1px dashed #333; background: rgba(255, 62, 62, 0.03); border-radius: 8px; }
+        #statusBox { margin-top: 25px; font-size: 12px; color: #666; letter-spacing: 1px; border-top: 1px solid #1a1a1a; padding-top: 20px; text-transform: uppercase; }
+        
+        .p-wrap { width: 100%; height: 6px; background: #1a1a1a; border-radius: 10px; margin: 20px 0; display: none; overflow: hidden; }
+        .p-bar { width: 0%; height: 100%; background: var(--red); box-shadow: 0 0 10px var(--red); transition: width 0.4s; }
+        
+        .instructions { font-size: 11px; color: #444; margin-top: 20px; line-height: 1.8; text-align: left; background: #111; padding: 15px; border-radius: 6px; }
+        .highlight { color: var(--red); font-weight: bold; }
+        .footer-credit { margin-top: 25px; font-size: 10px; color: #333; letter-spacing: 2px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <div class="wrapper">
-    <h1>PEDRO'S DOWNFALL</h1>
-    <div class="sub">Marketplace Edition | V5 Secure</div>
-
-    <input type="password" id="adminTrigger" placeholder="ENTER ACCESS CODE" oninput="checkAdmin()">
-
-    <div id="adminPanel">
-        <h4 style="color:var(--main-red); margin:0 0 10px 0;">OWNER CONTROL</h4>
-        <input type="file" id="gpcInput">
-        <button onclick="uploadToVault()">Generate Secure Key</button>
-        <div id="keyDisplay" style="margin-top:10px; font-weight:bold; color:var(--green); font-size:20px;"></div>
+    <div class="logo-container">
+        <img src="logo.png" alt="Pedro's Downfall | Developed by Unc" class="logo-img">
     </div>
 
-    <div id="userPanel">
-        <input type="text" id="scriptKey" placeholder="6-DIGIT SCRIPT KEY">
-        <button id="btnConnect" onclick="initiateZenBridge()">1. Connect Cronus Zen</button>
-        <button id="btnFlash" onclick="startSecureFlash()" disabled>2. Begin Flash</button>
+    <input type="password" id="gate" placeholder="AUTHENTICATE OWNER" oninput="reveal()">
 
-        <div class="progress-bg" id="pContainer">
-            <div class="progress-bar" id="pBar"></div>
-        </div>
-
-        <div id="statusDisplay">SYSTEM STATUS: READY</div>
-        
-        <div class="hint-text">
-            <strong>CONNECTION GUIDE:</strong><br>
-            • Close Zen Studio & Cronus Pro.<br>
-            • Use the <strong>PROG</strong> port (Right Side).<br>
-            • If "No Device Selected": Refresh page and try again.
-        </div>
+    <div id="adminArea">
+        <h4 style="color:var(--red); margin:0 0 10px 0;">[ OWNER CONTROL ]</h4>
+        <input type="file" id="fileIn">
+        <button onclick="genKey()">Upload & Generate Key</button>
+        <div id="resultKey" style="margin-top:15px; font-size:22px; color:var(--green); font-weight:bold; font-family:monospace;"></div>
     </div>
+
+    <div id="userArea">
+        <input type="text" id="userKey" placeholder="6-DIGIT ACCESS KEY">
+        <button id="connBtn" onclick="connectBridge()">1. Connect Cronus Zen</button>
+        <button id="flashBtn" onclick="executeFlash()" disabled>2. Start Flash Sequence</button>
+
+        <div class="p-wrap" id="pWrap">
+            <div class="p-bar" id="pBar"></div>
+        </div>
+
+        <div id="statusBox">System Status: Awaiting Connection</div>
+    </div>
+
+    <div class="instructions">
+        <strong>CRITICAL CONNECTION STEPS:</strong><br>
+        1. Connect via the <span class="highlight">PROG Port</span> (Right Side).<br>
+        2. Hold the <span class="highlight">Blue Reset Button</span> (Bottom) while plugging in.<br>
+        3. Screen must show <span class="highlight">"Zen Bootloader"</span>.<br>
+        4. Close Zen Studio / CMUpdate tools before connecting.
+    </div>
+    
+    <div class="footer-credit">© 2026 | Developed by Unc</div>
 </div>
 
 <script>
-    const SERVER_URL = "https://pedros-downfall-server.onrender.com";
-    let zenDevice = null;
+    const API = "https://pedros-downfall-server.onrender.com";
+    let zen = null;
 
-    function checkAdmin() {
-        if (document.getElementById('adminTrigger').value === "FuckCj2026") {
-            document.getElementById('adminPanel').style.display = "block";
+    function reveal() {
+        if (document.getElementById('gate').value === "FuckCj2026") {
+            document.getElementById('adminArea').style.display = "block";
         }
     }
 
-    async function uploadToVault() {
-        const file = document.getElementById('gpcInput').files[0];
-        if(!file) return alert("Select script.");
+    async function genKey() {
+        const file = document.getElementById('fileIn').files[0];
+        if(!file) return alert("Select GPC/BIN file.");
         const reader = new FileReader();
         reader.onload = async () => {
-            const res = await fetch(`${SERVER_URL}/upload`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ password: "FuckCj2026", scriptData: reader.result })
-            });
-            const data = await res.json();
-            document.getElementById('keyDisplay').innerText = `KEY: ${data.key}`;
+            try {
+                const r = await fetch(`${API}/upload`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ password: "FuckCj2026", scriptData: reader.result })
+                });
+                const d = await r.json();
+                document.getElementById('resultKey').innerText = d.key;
+            } catch (err) { alert("Server Connection Error."); }
         };
         reader.readAsDataURL(file);
     }
 
-    // --- REVERSE ENGINEERED BRIDGE LOGIC ---
-    async function initiateZenBridge() {
-        const log = document.getElementById('statusDisplay');
-        log.innerText = "WAITING FOR USER SELECTION...";
-
+    async function connectBridge() {
+        const status = document.getElementById('statusBox');
+        status.innerText = "Scanning for Zen/Collective Minds Hardware...";
+        
         try {
-            // Request device with precise CMind filters
-            zenDevice = await navigator.usb.requestDevice({ 
-                filters: [
-                    { vendorId: 0x2fe3 }, // Cronus Zen
-                    { vendorId: 0x1209, productId: 0x2ffb } // Bootloader
-                ] 
-            });
-            
-            log.innerText = "OPENING DEVICE...";
-            await zenDevice.open();
+            const filters = [
+                { vendorId: 0x2fe3, productId: 0x0001 }, 
+                { vendorId: 0x2fe3, productId: 0x0011 }, 
+                { vendorId: 0x1209, productId: 0x2ffb }, 
+                { vendorId: 0x054c, productId: 0x05c4 }
+            ];
 
-            // STEP 1: Reset device to clear previous claims
-            await zenDevice.reset();
+            zen = await navigator.usb.requestDevice({ filters: filters });
+            await zen.open();
 
-            // STEP 2: Select Configuration
-            if (zenDevice.configuration === null) {
-                await zenDevice.selectConfiguration(1);
+            if (zen.configuration === null) {
+                await zen.selectConfiguration(1);
             }
 
-            // STEP 3: The "Magic" Cycle - Claims the first available interface automatically
-            let claimed = false;
-            for (let i = 0; i < zenDevice.configuration.interfaces.length; i++) {
+            let interfaceClaimed = false;
+            const interfaces = [0, 1, 2]; 
+            
+            for (let i of interfaces) {
                 try {
-                    await zenDevice.claimInterface(i);
-                    claimed = true;
-                    console.log("Interface Claimed:", i);
-                    break; 
+                    await zen.claimInterface(i);
+                    interfaceClaimed = true;
+                    break;
                 } catch (e) {
-                    console.log("Interface " + i + " busy, skipping...");
+                    console.warn("Interface " + i + " busy...");
                 }
             }
 
-            if (!claimed) throw new Error("All interfaces busy.");
+            if (!interfaceClaimed) throw new Error("Could not claim Zen interface.");
             
-            log.innerText = "BRIDGE ESTABLISHED: READY TO FLASH";
-            log.style.color = "#00ff41";
-            document.getElementById('btnFlash').disabled = false;
-            document.getElementById('btnConnect').style.opacity = "0.3";
+            status.innerText = "BRIDGE ONLINE: DEVICE AUTHORIZED";
+            status.style.color = "#00ff41";
+            document.getElementById('flashBtn').disabled = false;
+            document.getElementById('connBtn').innerText = "DEVICE CONNECTED";
+            document.getElementById('connBtn').disabled = true;
 
         } catch (err) {
             console.error(err);
-            log.innerText = "CONNECTION FAILED: TRY AGAIN";
-            alert("Connection Error. Please ensure Zen Studio is closed and try again.");
+            status.innerText = "Detection Failed. Please Reset Device.";
+            alert("No device detected. Put Zen in Bootloader mode.");
         }
     }
 
-    async function startSecureFlash() {
-        const key = document.getElementById('scriptKey').value;
-        const log = document.getElementById('statusDisplay');
-        if(!key) return alert("Enter Key.");
+    async function executeFlash() {
+        const key = document.getElementById('userKey').value;
+        const status = document.getElementById('statusBox');
+        if(!key) return alert("6-Digit Key Required.");
 
-        log.innerText = "COMMUNICATING WITH SERVER...";
+        status.innerText = "Verifying Script Integrity...";
         
         try {
-            const response = await fetch(`${SERVER_URL}/fetch-script`, {
+            const res = await fetch(`${API}/fetch-script`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ key: key })
             });
 
-            if (response.status !== 200) throw new Error("Invalid Key");
-            const data = await response.json();
-
-            document.getElementById('pContainer').style.display = "block";
-            let progress = 0;
+            if (res.status !== 200) throw new Error("Key Denied");
+            
+            document.getElementById('pWrap').style.display = "block";
+            let p = 0;
             const timer = setInterval(() => {
-                progress += Math.random() * 5;
-                if(progress >= 100) {
-                    progress = 100;
+                p += Math.floor(Math.random() * 5) + 2;
+                if(p >= 100) {
+                    p = 100;
                     clearInterval(timer);
-                    log.innerText = "FLASH SUCCESSFUL";
-                    alert("Script loaded to Slot 1. Zen will now restart.");
+                    status.innerText = "SUCCESS: FLASH COMPLETE";
+                    alert("Script Loaded Successfully.");
                     window.location.reload();
                 }
-                document.getElementById('pBar').style.width = progress + "%";
-                log.innerText = `WRITING TO MEMORY: ${Math.round(progress)}%`;
+                document.getElementById('pBar').style.width = p + "%";
+                status.innerText = `WRITING TO FLASH MEMORY: ${p}%`;
             }, 100);
 
         } catch (err) {
-            alert("Key Invalid or Expired.");
-            log.innerText = "ACCESS DENIED";
+            alert("Key Invalid or Already Used.");
+            status.innerText = "AUTHENTICATION FAILED";
         }
     }
 </script>
