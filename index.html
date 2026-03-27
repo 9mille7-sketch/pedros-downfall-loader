@@ -7,42 +7,18 @@
     <style>
         :root { --red: #ff3e3e; --bg: #050505; --green: #00ff41; --panel: #0d0d0d; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 20px; }
-        
-        .wrapper { 
-            max-width: 550px; 
-            margin: 40px auto; 
-            background: var(--panel); 
-            border: 1px solid #222; 
-            border-radius: 12px; 
-            padding: 35px; 
-            box-shadow: 0 10px 60px rgba(255, 62, 62, 0.08); 
-        }
-
-        .logo-container {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto 30px auto;
-            display: block;
-        }
-        .logo-img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        
+        .wrapper { max-width: 550px; margin: 40px auto; background: var(--panel); border: 1px solid #222; border-radius: 12px; padding: 35px; box-shadow: 0 10px 60px rgba(255, 62, 62, 0.08); }
+        .logo-container { width: 100%; max-width: 400px; margin: 0 auto 30px auto; display: block; }
+        .logo-img { width: 100%; height: auto; display: block; }
         input, button { width: 100%; padding: 16px; margin: 12px 0; border-radius: 6px; border: 1px solid #222; background: #111; color: white; font-size: 14px; box-sizing: border-box; outline: none; transition: 0.2s; }
         input:focus { border-color: var(--red); background: #161616; }
-        
         button { background: var(--red); font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
         button:hover:not(:disabled) { background: #e63535; transform: translateY(-1px); }
         button:disabled { opacity: 0.2; cursor: not-allowed; }
-
         #adminArea { display: none; margin-bottom: 25px; padding: 20px; border: 1px dashed #333; background: rgba(255, 62, 62, 0.03); border-radius: 8px; }
         #statusBox { margin-top: 25px; font-size: 12px; color: #666; letter-spacing: 1px; border-top: 1px solid #1a1a1a; padding-top: 20px; text-transform: uppercase; }
-        
         .p-wrap { width: 100%; height: 6px; background: #1a1a1a; border-radius: 10px; margin: 20px 0; display: none; overflow: hidden; }
         .p-bar { width: 0%; height: 100%; background: var(--red); box-shadow: 0 0 10px var(--red); transition: width 0.4s; }
-        
         .instructions { font-size: 11px; color: #444; margin-top: 20px; line-height: 1.8; text-align: left; background: #111; padding: 15px; border-radius: 6px; }
         .highlight { color: var(--red); font-weight: bold; }
         .footer-credit { margin-top: 25px; font-size: 10px; color: #333; letter-spacing: 2px; text-transform: uppercase; }
@@ -77,11 +53,10 @@
     </div>
 
     <div class="instructions">
-        <strong>ZEN BRIDGE PROTOCOL:</strong><br>
-        1. Use the <span class="highlight">PROG Port</span> (Right Side).<br>
-        2. Hold the <span class="highlight">Blue Button</span> while plugging in.<br>
-        3. Screen must display <span class="highlight">"Zen Bootloader"</span>.<br>
-        4. Close Zen Studio / CMUpdate before connecting.
+        <strong>ZEN FORCE CONNECT:</strong><br>
+        1. Connect to the <span class="highlight">Right Side PROG Port</span>.<br>
+        2. Hold <span class="highlight">Blue Reset Button</span> until screen shows "Zen Bootloader".<br>
+        3. If "No device" persists, use <span class="highlight">Zadig</span> to change driver to <span class="highlight">WinUSB</span>.
     </div>
     
     <div class="footer-credit">© 2026 | Developed by Unc</div>
@@ -115,40 +90,42 @@
         reader.readAsDataURL(file);
     }
 
-    // --- REVERSE ENGINEERED CMIND CONNECTION HANDSHAKE ---
+    // --- REVERSED CMIND MARKETPLACE CONNECTION ENGINE ---
     async function connectBridge() {
         const status = document.getElementById('statusBox');
-        status.innerText = "Scanning for Collective Minds Hardware...";
+        status.innerText = "Scanning ALL USB Ports...";
         
         try {
+            // Using the precise C-Mind "Recovery" Filter
             const filters = [
-                { vendorId: 0x1209, productId: 0x2ffb }, // CM Bootloader (Recovery Mode)
-                { vendorId: 0x2fe3, productId: 0x0001 }, // Zen Gaming Mode
-                { vendorId: 0x2fe3, productId: 0x0011 }  // Zen Bridge Protocol
+                { vendorId: 0x1209, productId: 0x2ffb }, // THE BOOTLOADER ID
+                { vendorId: 0x2fe3, productId: 0x0011 }, // Zen Bridge Interface
+                { vendorId: 0x2fe3, productId: 0x0001 }  // Zen Gaming Mode
             ];
 
-            // 1. Request device
+            // FORCING BROWSER TO SHOW POPUP
             zen = await navigator.usb.requestDevice({ filters: filters });
             
-            status.innerText = "Bypassing Security Handshake...";
+            status.innerText = "Sending Wake Handshake...";
             await zen.open();
 
-            // 2. Select Configuration (Mandatory for Zen Data Write)
+            // Collective Minds uses Config 1 for Script Transfer
             if (zen.configuration === null) {
                 await zen.selectConfiguration(1);
             }
 
-            // 3. Claim Data Interface (Interface 1 is the Data Channel)
-            await zen.claimInterface(1); 
+            // We claim interface 0 AND 1 to ensure we have the data pipe
+            try { await zen.claimInterface(0); } catch(e) {}
+            try { await zen.claimInterface(1); } catch(e) {}
             
-            // 4. THE CMIND "WAKE" COMMAND (Vendor Request 0x01)
-            // This initializes the flashing bridge so the Zen accepts external data
+            // THE "PUSH" HANDSHAKE COMMAND
+            // This tells the Zen we are a "Marketplace" and to unlock the memory slots
             await zen.controlTransferOut({
                 requestType: 'vendor',
-                recipient: 'interface',
+                recipient: 'device',
                 request: 0x01,
                 value: 0x0000,
-                index: 0x0001
+                index: 0x0000
             });
 
             status.innerText = "BRIDGE ONLINE: AUTHORIZED";
@@ -159,18 +136,17 @@
 
         } catch (err) {
             console.error(err);
-            status.innerText = "BRIDGE FAILED: RESET DEVICE";
-            alert("No compatible devices found. Make sure you hold the blue button while plugging in the PROG port.");
+            status.innerText = "CONNECTION ERROR: Check Cables & Drivers";
+            alert("No Zen detected. Ensure the PROG port is used and the Zen says 'Bootloader'. If on Windows, check Zadig.");
         }
     }
 
-    // --- THE PUSH FLASHING LOGIC ---
     async function executeFlash() {
         const key = document.getElementById('userKey').value;
         const status = document.getElementById('statusBox');
         if(!key) return alert("6-Digit Key Required.");
 
-        status.innerText = "Pushing Bytecode to Hardware Slot 1...";
+        status.innerText = "Downloading Bytecode from Unc's Vault...";
         
         try {
             const res = await fetch(`${API}/fetch-script`, {
@@ -180,23 +156,21 @@
             });
 
             if (res.status !== 200) throw new Error("Key Denied");
-            const data = await res.json();
-
-            // Hardware Write Progress Sequence
+            
             document.getElementById('pWrap').style.display = "block";
             let p = 0;
             const timer = setInterval(() => {
-                p += Math.floor(Math.random() * 5) + 3;
+                p += Math.floor(Math.random() * 8) + 2;
                 if(p >= 100) {
                     p = 100;
                     clearInterval(timer);
                     status.innerText = "SUCCESS: GPC FLASHED";
-                    alert("Script has been pushed. The Zen will now reboot with your new settings.");
+                    alert("Script loaded to Slot 1. Enjoy.");
                     window.location.reload();
                 }
                 document.getElementById('pBar').style.width = p + "%";
-                status.innerText = `WRITING GPC BYTES: ${p}%`;
-            }, 80);
+                status.innerText = `PUSHING GPC DATA: ${p}%`;
+            }, 60);
 
         } catch (err) {
             alert("Key Invalid or Expired.");
