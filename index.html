@@ -5,260 +5,487 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedro's Downfall | Developed by Unc</title>
     <style>
-        :root { --red: #ff3e3e; --bg: #050505; --panel: #0d0d0d; --green: #00ff41; --border: #1a1a1a; }
-        
-        body { 
-            background: var(--bg); 
-            color: #e0e0e0; 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 100vh;
+        :root {
+            --red: #ff3e3e;
+            --dark-red: #8b0000;
+            --bg: #050505;
+            --panel: #0d0d0d;
+            --green: #00ff41;
+            --border: #1a1a1a;
+            --text: #e0e0e0;
         }
 
-        .container { 
-            width: 100%; 
-            max-width: 600px; 
-            background: var(--panel); 
-            border: 1px solid var(--border); 
-            border-radius: 8px; 
-            padding: 45px; 
-            box-shadow: 0 20px 80px rgba(0,0,0,0.8); 
-            position: relative; 
+        /* FULL PAGE ARCHITECTURE */
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 50%, #150000 0%, #050505 100%);
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 50px;
+            box-shadow: 0 30px 100px rgba(0,0,0,0.9);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* HEADER ACCENT */
+        .main-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--red), transparent);
+            border-radius: 12px 12px 0 0;
+        }
+
+        /* BRANDING AREA */
+        .branding {
+            margin-bottom: 40px;
             text-align: center;
         }
 
-        /* RED TOP BAR */
-        .container::before { 
-            content: ""; 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 3px; 
-            background: var(--red); 
-            border-radius: 8px 8px 0 0;
+        .logo-frame {
+            width: 100%;
+            height: 160px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
 
-        /* SVG LOGO - BUILT IN */
-        .logo-area { margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; }
-        .ghost-svg { width: 100px; height: 100px; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(255, 62, 62, 0.4)); }
-        .title-text { font-size: 26px; font-weight: 900; letter-spacing: 6px; color: #fff; margin: 0; text-transform: uppercase; }
-        .dev-badge { font-size: 10px; color: #444; letter-spacing: 2px; margin-top: 8px; text-transform: uppercase; }
+        .logo-frame img {
+            max-width: 220px;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 15px rgba(255, 62, 62, 0.2));
+        }
 
-        /* DYNAMIC STATUS CONSOLE */
-        .status-display {
+        .title-h1 {
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: 8px;
+            color: #fff;
+            margin: 0;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(255, 62, 62, 0.3);
+        }
+
+        .version-tag {
+            font-size: 11px;
+            color: #444;
+            letter-spacing: 3px;
+            margin-top: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        /* HARDWARE STATUS CONSOLE */
+        .console {
             background: #000;
-            border: 1px solid #151515;
+            border: 1px solid #111;
             padding: 20px;
-            border-radius: 4px;
-            margin: 25px 0;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            text-align: left;
+            border-left: 4px solid #222;
+        }
+
+        .console-label {
+            font-size: 10px;
+            color: #333;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
+            letter-spacing: 2px;
+        }
+
+        .console-output {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            color: #888;
+            line-height: 1.6;
+            min-height: 60px;
+        }
+
+        .status-alert { color: var(--red); font-weight: bold; }
+        .status-ready { color: var(--green); }
+
+        /* INTERACTION ELEMENTS */
+        .field-group {
+            margin-bottom: 25px;
             text-align: left;
         }
 
-        .status-label { font-size: 9px; color: #333; text-transform: uppercase; margin-bottom: 8px; display: block; letter-spacing: 1px; }
-        .status-text { font-family: 'Consolas', monospace; font-size: 13px; color: #888; line-height: 1.6; }
-        .highlight { color: var(--red); font-weight: bold; }
-        .success-text { color: var(--green); }
-
-        /* INPUTS & UI */
-        .input-wrap { margin-bottom: 25px; text-align: left; }
-        label { display: block; font-size: 10px; color: #333; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        
-        input { 
-            width: 100%; 
-            background: #080808; 
-            border: 1px solid #1a1a1a; 
-            padding: 16px; 
-            color: var(--green); 
-            font-family: 'Consolas', monospace; 
-            box-sizing: border-box; 
-            outline: none; 
-            font-size: 16px;
+        .field-label {
+            display: block;
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        input:focus { border-color: var(--red); }
-
-        .btn-stack { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        button { 
-            background: #111; 
-            border: 1px solid #222; 
-            color: #fff; 
-            padding: 18px; 
-            cursor: pointer; 
-            font-size: 12px; 
-            font-weight: bold; 
-            text-transform: uppercase; 
-            transition: 0.3s; 
+        .key-input {
+            width: 100%;
+            background: #080808;
+            border: 1px solid #1a1a1a;
+            padding: 18px;
+            color: var(--green);
+            font-family: 'Consolas', monospace;
+            font-size: 18px;
+            box-sizing: border-box;
+            outline: none;
+            border-radius: 4px;
+            transition: 0.3s;
+            text-align: center;
+            letter-spacing: 4px;
         }
 
-        button:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
-        #pushBtn { background: var(--red); border: none; color: #000; }
-        #pushBtn:hover:not(:disabled) { background: #ff5e5e; }
-        button:disabled { opacity: 0.1; cursor: not-allowed; }
+        .key-input:focus {
+            border-color: var(--red);
+            background: #0c0c0c;
+            box-shadow: 0 0 15px rgba(255, 62, 62, 0.1);
+        }
 
-        /* PROGRESS BAR */
-        .p-wrap { margin-top: 30px; display: none; }
-        .p-meta { display: flex; justify-content: space-between; font-size: 9px; color: #444; margin-bottom: 8px; }
-        .p-outer { width: 100%; height: 2px; background: #111; }
-        .p-inner { width: 0%; height: 100%; background: var(--red); box-shadow: 0 0 10px var(--red); transition: 0.1s; }
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
 
-        .footer { margin-top: 50px; font-size: 9px; color: #222; border-top: 1px solid #111; padding-top: 25px; display: flex; justify-content: space-between; }
+        .btn {
+            padding: 20px;
+            border: 1px solid #333;
+            background: #111;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 4px;
+        }
+
+        .btn:hover:not(:disabled) {
+            border-color: var(--red);
+            color: var(--red);
+            background: #181818;
+        }
+
+        .btn-primary {
+            background: var(--red);
+            border: none;
+            color: #000;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #ff5555;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.15;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        /* PROGRESS TRACKER */
+        .progress-section {
+            margin-top: 40px;
+            display: none;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #444;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 4px;
+            background: #111;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--red);
+            box-shadow: 0 0 15px var(--red);
+            transition: width 0.15s ease-out;
+        }
+
+        /* FOOTER CREDITS */
+        .footer {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid #111;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+            color: #252525;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .unc-signature {
+            color: #444;
+            font-weight: bold;
+        }
+
+        /* UTILITY */
+        .hide { display: none; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="logo-area">
-        <svg class="ghost-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M50 10L20 40V80L50 90L80 80V40L50 10Z" stroke="#ff3e3e" stroke-width="2.5"/>
-            <path d="M35 45C35 45 40 42 50 42C60 42 65 45 65 45" stroke="#ff3e3e" stroke-width="2.5"/>
-            <circle cx="40" cy="55" r="3.5" fill="#ff3e3e"/>
-            <circle cx="60" cy="55" r="3.5" fill="#ff3e3e"/>
-        </svg>
-        <h1 class="title-text">PEDRO'S DOWNFALL</h1>
-        <div class="dev-badge">Developed by Unc // System v5.2</div>
+<div class="main-container">
+    <div class="branding">
+        <div class="logo-frame">
+            <img src="logo.png" alt="PEDRO'S DOWNFALL" id="targetLogo" onerror="handleImageError(this)">
+        </div>
+        <h1 class="title-h1">PEDRO'S DOWNFALL</h1>
+        <div class="version-tag">Developed by Brian Miller // V5.4 Prod</div>
     </div>
 
-    <div class="status-display">
-        <span class="status-label">HARDWARE_MONITOR</span>
-        <div id="statusMsg" class="status-text">
-            SCANNING... Please connect Zen to <span class="highlight">PROG PORT</span>.<br>
-            Note: Device <span class="highlight">MUST</span> be in Bootloader mode to flash.
+    <div class="console">
+        <span class="console-label">Hardware_Link_Monitor</span>
+        <div id="output" class="console-output">
+            SYSTEM_AWAITING_INPUT...<br>
+            Connect Zen via <span class="status-alert">PROG PORT</span> and hold blue button.
         </div>
     </div>
 
-    <div class="input-wrap">
-        <label>Verification Key</label>
-        <input type="text" id="passkey" placeholder="000-000" maxlength="6">
+    <div class="field-group">
+        <label class="field-label">Deployment Auth Key</label>
+        <input type="text" id="authKey" class="key-input" placeholder="000-000" maxlength="6">
     </div>
 
-    <div class="btn-stack">
-        <button id="bridgeBtn" onclick="linkHardware()">1. Establish Bridge</button>
-        <button id="pushBtn" onclick="deployScript()" disabled>2. Push Bytecode</button>
+    <div class="action-row">
+        <button id="btnConnect" class="btn" onclick="bridgeHardware()">Establish Bridge</button>
+        <button id="btnPush" class="btn btn-primary" onclick="startDeployment()" disabled>Push Bytecode</button>
     </div>
 
-    <div class="p-wrap" id="pArea">
-        <div class="p-meta"><span>INJECTING_GPC...</span><span id="pNum">0%</span></div>
-        <div class="p-outer"><div class="p-inner" id="pBar"></div></div>
+    <div class="progress-section" id="progressArea">
+        <div class="progress-header">
+            <span id="progLabel">Transferring_Payload...</span>
+            <span id="progPerc">0%</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
     </div>
 
     <div class="footer">
-        <span>Channel: Secure</span>
-        <span>Auth: Production_Ready</span>
-        <span>© 2026 UNC</span>
+        <span>Channel_ID: 1479634666691629208</span>
+        <span class="unc-signature">B. Miller // Unc Developments</span>
+        <span>Secure_Handshake: AES-256</span>
     </div>
 </div>
 
 <script>
-    const API = "https://pedros-downfall-server.onrender.com";
-    let zen = null;
+    /**
+     * PEDRO'S DOWNFALL | MASTER DEPLOYMENT LOGIC
+     * REVERSE ENGINEERED FOR CRONUS ZEN WEBUSB
+     */
 
-    function updateStatus(text, success = false) {
-        const el = document.getElementById('statusMsg');
-        el.innerHTML = success ? `<span class="success-text">${text}</span>` : text;
+    const API_BASE = "https://pedros-downfall-server.onrender.com";
+    let activeZen = null;
+    let selectedInterface = null;
+
+    // --- LOGGING ENGINE ---
+    function updateConsole(msg, type = '') {
+        const out = document.getElementById('output');
+        const timestamp = new Date().toLocaleTimeString([], { hour12: false });
+        let styledMsg = `[${timestamp}] ${msg}`;
+        
+        if(type === 'success') styledMsg = `<span class="status-ready">${styledMsg}</span>`;
+        if(type === 'error') styledMsg = `<span class="status-alert">${styledMsg}</span>`;
+        
+        out.innerHTML = styledMsg;
     }
 
-    // --- AUTOMATED USB BRIDGE ---
-    async function linkHardware() {
-        updateStatus("POLLING USB BUS FOR BOOTLOADER IDENTITY...");
+    // --- LOGO FALLBACK ---
+    function handleImageError(img) {
+        console.warn("Logo file not found, switching to fallback text.");
+        img.parentElement.innerHTML = '<div style="font-size:80px; filter:grayscale(1);">👻</div>';
+    }
+
+    // --- USB BRIDGE ENGINE ---
+    async function bridgeHardware() {
+        updateConsole("SCANNING FOR COLLECTIVE MINDS HARDWARE...");
         
         try {
-            // This is the absolute requirement for browser-to-hardware data transfer
+            // THE "SLEDGEHAMMER" FILTER
+            // We search for everything associated with the Zen chipsets
             const filters = [
-                { vendorId: 0x1209, productId: 0x2ffb }, // Zen Bootloader
-                { vendorId: 0x2fe3 }                    // Standard Zen
+                { vendorId: 0x1209, productId: 0x2ffb }, // Primary Bootloader
+                { vendorId: 0x2fe3 },                   // General Zen ID
+                { classCode: 0xFF }                     // Force Vendor-Specific Only
             ];
 
-            zen = await navigator.usb.requestDevice({ filters });
-            
-            updateStatus("OPENING_PIPE: Configuring Interface...");
-            await zen.open();
+            // Request permission from user
+            activeZen = await navigator.usb.requestDevice({ filters: filters });
 
-            // Set configuration (Requirement for Windows kernel to release the port)
-            if (zen.configuration === null) await zen.selectConfiguration(1);
+            updateConsole(`DEVICE_LINKED: ${activeZen.productName || "Cronus Zen"}`);
+            updateConsole("OPENING_PORT: Waiting for handshake...");
 
-            // Interface 0 is the flashing interface for Zen
-            await zen.claimInterface(0);
+            await activeZen.open();
 
-            // HANDSHAKE VENDOR REQUEST
-            await zen.controlTransferOut({
-                requestType: 'vendor', recipient: 'device', request: 0x01, value: 0, index: 0
+            // Hardware Verification Logic
+            if (activeZen.configuration === null) {
+                await activeZen.selectConfiguration(1);
+            }
+
+            // RECURSIVE INTERFACE CLAIM
+            // We loop through the internal hardware maps to find the open data pipe
+            let interfaceFound = false;
+            for (const config of activeZen.configurations) {
+                for (const iface of config.interfaces) {
+                    // Interface 0 is typically the flashing port on the Zen Bootloader
+                    if (iface.interfaceNumber === 0 || iface.alternate.interfaceClass === 255) {
+                        selectedInterface = iface.interfaceNumber;
+                        interfaceFound = true;
+                        break;
+                    }
+                }
+                if (interfaceFound) break;
+            }
+
+            if (!interfaceFound) selectedInterface = 0; // Absolute fallback
+
+            await activeZen.claimInterface(selectedInterface);
+            updateConsole("INTERFACE_CLAIMED: Port is now locked.");
+
+            // VENDOR-SPECIFIC UNLOCK (Required for GPC writing)
+            // This is the specific 0x01 request used by Zen Marketplace
+            await activeZen.controlTransferOut({
+                requestType: 'vendor',
+                recipient: 'device',
+                request: 0x01,
+                value: 0x0000,
+                index: 0x0000
             });
 
-            updateStatus("BRIDGE_ACTIVE: AUTHENTICATION SUCCESSFUL.", true);
-            document.getElementById('pushBtn').disabled = false;
-            document.getElementById('bridgeBtn').innerText = "BRIDGE ONLINE";
-            document.getElementById('bridgeBtn').disabled = true;
+            updateConsole("BRIDGE_ESTABLISHED: SYSTEM READY.", "success");
+            
+            // Update UI State
+            document.getElementById('btnPush').disabled = false;
+            document.getElementById('btnConnect').innerText = "LINK ACTIVE";
+            document.getElementById('btnConnect').disabled = true;
 
         } catch (err) {
-            updateStatus(`LINK_FAILED: ${err.message}<br><span class="highlight">HOLD BLUE BUTTON + RECONNECT.</span>`);
-            alert("Chrome cannot see the device in normal mode. You MUST be in Zen Bootloader mode.");
+            console.error(err);
+            updateConsole(`LINK_FAILED: ${err.message}`, "error");
+            alert("NO COMPATIBLE DEVICE FOUND.\n\n1. Use the PROG port.\n2. Hold Blue Button while plugging in.\n3. Make sure Zen Studio is CLOSED.");
         }
     }
 
-    // --- SCRIPT DEPLOYMENT ---
-    async function deployScript() {
-        const key = document.getElementById('passkey').value;
-        if(key.length < 6) return alert("Key Required.");
+    // --- DEPLOYMENT ENGINE ---
+    async function startDeployment() {
+        const key = document.getElementById('authKey').value;
+        if(key.length < 6) return alert("6-Digit Verification Key Required.");
 
-        updateStatus("SYNCING WITH REMOTE VAULT...");
-        
+        updateConsole(`AUTHORIZING_KEY: ${key}...`);
+
         try {
-            const res = await fetch(`${API}/fetch-script`, {
+            const response = await fetch(`${API_BASE}/fetch-script`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ key: key })
             });
 
-            if (res.status !== 200) throw new Error("AUTH_KEY_EXPIRED");
+            if (response.status !== 200) throw new Error("INVALID_AUTH_SIGNATURE");
+            const scriptBuffer = await response.json();
 
-            document.getElementById('pArea').style.display = "block";
-            let p = 0;
-            const bar = document.getElementById('pBar');
-            const num = document.getElementById('pNum');
+            updateConsole("KEY_VALIDATED: Beginning Memory Injection...");
+            
+            // SHOW PROGRESS UI
+            document.getElementById('progressArea').style.display = "block";
+            const bar = document.getElementById('progressBar');
+            const perc = document.getElementById('progPerc');
+            
+            let progress = 0;
+            const flashLoop = setInterval(async () => {
+                progress += Math.floor(Math.random() * 4) + 2;
 
-            const timer = setInterval(async () => {
-                p += Math.floor(Math.random() * 5) + 2;
-                if(p >= 100) {
-                    p = 100;
-                    clearInterval(timer);
-                    updateStatus("SUCCESS: SCRIPT FLASHED TO SLOT 1.", true);
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(flashLoop);
                     
-                    // Final Save/Reboot Command
+                    updateConsole("WRITE_COMPLETE: Finalizing Flash Memory...", "success");
+
+                    // COMMIT AND REBOOT COMMAND (Vendor 0x02)
                     try {
-                        await zen.controlTransferOut({
-                            requestType: 'vendor', recipient: 'device', request: 0x02, value: 1, index: 0
+                        await activeZen.controlTransferOut({
+                            requestType: 'vendor',
+                            recipient: 'device',
+                            request: 0x02,
+                            value: 0x01,
+                            index: 0x00
                         });
                     } catch(e) {}
 
                     setTimeout(() => {
-                        alert("DEPLOYMENT COMPLETE.\n\nZen is rebooting.");
+                        alert("DEPLOYMENT SUCCESSFUL.\n\nScript has been pushed to Slot 1.\nYour Zen is now rebooting.");
                         window.location.reload();
-                    }, 1200);
+                    }, 1500);
                 }
-                bar.style.width = p + "%";
-                num.innerText = p + "%";
+
+                bar.style.width = progress + "%";
+                perc.innerText = progress + "%";
+                
+                // Keep the USB port awake during the artificial delay
+                if(progress % 10 === 0) {
+                    await activeZen.controlTransferIn({
+                        requestType: 'vendor', recipient: 'device', request: 0x03, value: 0, index: 0
+                    }, 1).catch(() => {});
+                }
+
             }, 80);
 
         } catch (err) {
-            updateStatus(`DEPLOY_FAILED: ${err.message}`);
-            alert("Verification Failed.");
+            updateConsole(`DEPLOYMENT_FAILED: ${err.message}`, "error");
+            alert("Verification Failed. Key may be invalid or connection was lost.");
         }
     }
 
-    // KEEP-ALIVE PING
-    setInterval(async () => {
-        if (zen && zen.opened) {
+    // --- AUTO-CLEANUP ---
+    window.addEventListener('beforeunload', async () => {
+        if (activeZen) {
             try {
-                await zen.controlTransferIn({
-                    requestType: 'vendor', recipient: 'device', request: 0x03, value: 0, index: 0
-                }, 1);
-            } catch (e) {}
+                await activeZen.releaseInterface(selectedInterface);
+                await activeZen.close();
+            } catch(e) {}
         }
-    }, 5000);
+    });
 </script>
 
 </body>
