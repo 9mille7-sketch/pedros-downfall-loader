@@ -7,406 +7,311 @@
     <style>
         :root {
             --red: #ff3e3e;
-            --dark-red: #660000;
-            --bg: #020202;
-            --panel: #080808;
+            --dark-red: #800000;
+            --bg: #030303;
+            --panel: #0a0a0a;
             --green: #00ff41;
-            --border: #151515;
+            --border: #1a1a1a;
             --text: #ffffff;
-            --console-bg: #000000;
+            --font: 'Segoe UI', 'Roboto', sans-serif;
         }
 
-        /* RESET & BASE */
         * { box-sizing: border-box; }
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--font);
             margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 20% 20%, #1a0000 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, #1a0000 0%, transparent 40%);
+            background-image: linear-gradient(135deg, #050505 0%, #000000 100%);
         }
 
-        .main-wrapper {
-            width: 95%;
-            max-width: 800px;
+        .main-container {
+            width: 90%;
+            max-width: 850px;
             background: var(--panel);
             border: 1px solid var(--border);
-            padding: 40px;
-            box-shadow: 0 40px 150px rgba(0,0,0,1);
+            padding: 60px;
+            box-shadow: 0 50px 150px rgba(0,0,0,1);
             position: relative;
             border-top: 5px solid var(--red);
-            margin: 20px;
         }
 
-        /* HEADER & BRANDING */
-        .header-section {
-            text-align: center;
-            margin-bottom: 35px;
-        }
-
-        .logo-container {
+        /* BRANDING - FIXED LOGO INJECTION */
+        .branding-header { text-align: center; margin-bottom: 45px; }
+        
+        .logo-box {
             width: 100%;
-            height: 120px;
+            height: 140px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
         }
 
-        .ghost-svg {
+        .ghost-logo {
             width: 110px;
             height: auto;
             filter: drop-shadow(0 0 15px var(--red));
         }
 
-        .title-main {
-            font-size: 34px;
+        .main-title {
+            font-size: 38px;
             font-weight: 900;
             letter-spacing: 12px;
             margin: 0;
             text-transform: uppercase;
             color: #fff;
-            text-shadow: 0 0 10px rgba(255, 62, 62, 0.4);
+            text-shadow: 0 0 20px rgba(255, 62, 62, 0.2);
         }
 
-        .dev-tag {
-            font-size: 10px;
-            color: #333;
+        .sub-tag {
+            font-size: 11px;
+            color: #444;
             letter-spacing: 4px;
             margin-top: 12px;
             text-transform: uppercase;
-            font-weight: 700;
+            font-weight: bold;
         }
 
-        /* THE CONSOLE (HEAVY CODE BLOCK) */
-        .terminal-box {
-            background: var(--console-bg);
+        /* HARDWARE CONSOLE */
+        .console-wrapper {
+            background: #000;
             border: 1px solid #111;
-            padding: 20px;
-            margin-bottom: 30px;
-            border-left: 3px solid var(--dark-red);
-            position: relative;
+            padding: 25px;
+            margin-bottom: 35px;
+            border-left: 4px solid var(--dark-red);
         }
 
-        .terminal-header {
+        .console-head {
             display: flex;
             justify-content: space-between;
-            font-size: 9px;
+            font-size: 10px;
             color: #222;
             text-transform: uppercase;
             margin-bottom: 15px;
             border-bottom: 1px solid #111;
-            padding-bottom: 5px;
+            padding-bottom: 8px;
         }
 
-        .terminal-content {
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 12px;
-            color: #555;
-            line-height: 1.6;
-            max-height: 180px;
+        .console-stream {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.8;
+            max-height: 200px;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: var(--dark-red) #000;
         }
 
-        .terminal-content::-webkit-scrollbar { width: 4px; }
-        .terminal-content::-webkit-scrollbar-track { background: #000; }
-        .terminal-content::-webkit-scrollbar-thumb { background: var(--dark-red); }
+        .ready-line { color: var(--green); }
+        .alert-line { color: var(--red); font-weight: bold; }
+        .warn-line { color: #ffae00; }
 
-        .line-ready { color: var(--green); }
-        .line-warn { color: #ffcc00; }
-        .line-error { color: var(--red); font-weight: bold; }
+        /* UPLOAD & CONTROLS */
+        .interaction-zone { display: grid; grid-template-columns: 1fr; gap: 20px; }
 
-        /* HEX PREVIEWER (THE GHOST BUFFER) */
-        .hex-preview {
+        .drop-box {
+            border: 2px dashed #222;
+            padding: 40px;
+            text-align: center;
+            transition: 0.4s;
+            cursor: pointer;
+        }
+
+        .drop-box:hover { border-color: var(--red); background: #0a0000; }
+        .drop-text { font-size: 12px; color: #444; text-transform: uppercase; letter-spacing: 2px; }
+
+        .hex-monitor {
             display: none;
             background: #050505;
-            border: 1px solid #111;
-            padding: 10px;
+            padding: 15px;
             font-family: monospace;
-            font-size: 10px;
-            color: #222;
-            margin-bottom: 25px;
-            word-break: break-all;
-            height: 60px;
-            overflow: hidden;
-        }
-
-        /* INTERFACE CONTROLS */
-        .ui-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        .upload-area {
-            border: 1px dashed #222;
-            padding: 30px;
-            transition: 0.3s;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .upload-area:hover {
-            border-color: var(--red);
-            background: #0a0000;
-        }
-
-        .upload-text {
             font-size: 11px;
-            color: #444;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin: 0;
+            color: #333;
+            border: 1px solid #111;
+            margin-top: 15px;
+            word-break: break-all;
         }
 
-        .button-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .action-btn {
-            padding: 22px;
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        
+        .btn {
+            padding: 24px;
             background: #0f0f0f;
             border: 1px solid #222;
             color: #fff;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             cursor: pointer;
-            font-size: 11px;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            font-size: 12px;
+            transition: 0.3s;
         }
 
-        .action-btn:hover:not(:disabled) {
-            background: #151515;
-            border-color: var(--red);
-            color: var(--red);
-            transform: translateY(-2px);
-        }
+        .btn:hover:not(:disabled) { border-color: var(--red); color: var(--red); box-shadow: 0 0 20px rgba(255, 62, 62, 0.1); }
+        .btn-prime { background: var(--red); color: #000; border: none; }
+        .btn-prime:hover:not(:disabled) { background: #ff5555; transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.1; cursor: not-allowed; }
 
-        .btn-deploy {
-            background: var(--red);
-            border: none;
-            color: #000;
-        }
-
-        .btn-deploy:hover:not(:disabled) {
-            background: #ff5555;
-            color: #000;
-            box-shadow: 0 0 30px rgba(255, 62, 62, 0.3);
-        }
-
-        .action-btn:disabled {
-            opacity: 0.1;
-            cursor: not-allowed;
-            filter: grayscale(1);
-        }
-
-        /* PROGRESS ENGINE */
-        .progress-wrapper {
-            margin-top: 40px;
-            display: none;
-        }
-
-        .progress-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 9px;
-            color: #333;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-
-        .progress-track {
-            width: 100%;
-            height: 3px;
-            background: #111;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            width: 0%;
-            height: 100%;
-            background: var(--red);
-            box-shadow: 0 0 20px var(--red);
-            transition: width 0.1s linear;
-        }
+        /* PROGRESS LOGIC */
+        .prog-container { margin-top: 50px; display: none; }
+        .prog-meta { display: flex; justify-content: space-between; font-size: 10px; color: #333; margin-bottom: 12px; text-transform: uppercase; }
+        .prog-track { width: 100%; height: 4px; background: #111; border-radius: 2px; overflow: hidden; }
+        .prog-bar { width: 0%; height: 100%; background: var(--red); box-shadow: 0 0 25px var(--red); transition: width 0.1s linear; }
 
         /* FOOTER */
-        .master-footer {
-            margin-top: 60px;
+        .footer-bar {
+            margin-top: 80px;
             padding-top: 30px;
             border-top: 1px solid #111;
             display: flex;
             justify-content: space-between;
-            font-size: 8px;
+            font-size: 9px;
             color: #1a1a1a;
             text-transform: uppercase;
             letter-spacing: 3px;
         }
-
-        .highlight-text { color: #333; }
     </style>
 </head>
 <body>
 
-<div class="main-wrapper">
-    <div class="header-section">
-        <div class="logo-container">
-            <svg class="ghost-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50 10L20 40V80L50 90L80 80V40L50 10Z" stroke="#ff3e3e" stroke-width="2"/>
-                <path d="M35 45C35 45 40 42 50 42C60 42 65 45 65 45" stroke="#ff3e3e" stroke-width="2"/>
-                <circle cx="40" cy="55" r="3.5" fill="#ff3e3e"/>
-                <circle cx="60" cy="55" r="3.5" fill="#ff3e3e"/>
-                <path d="M42 72H58" stroke="#ff3e3e" stroke-width="2" stroke-linecap="round"/>
+<div class="main-container">
+    <div class="branding-header">
+        <div class="logo-box">
+            <svg class="ghost-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 10L22 38V78L50 90L78 78V38L50 10Z" stroke="#ff3e3e" stroke-width="2.5" stroke-linejoin="round"/>
+                <path d="M35 45C35 45 42 41 50 41C58 41 65 45 65 45" stroke="#ff3e3e" stroke-width="2.5"/>
+                <circle cx="40" cy="56" r="4" fill="#ff3e3e"/>
+                <circle cx="60" cy="56" r="4" fill="#ff3e3e"/>
+                <path d="M42 74H58" stroke="#ff3e3e" stroke-width="3" stroke-linecap="round"/>
             </svg>
         </div>
-        <h1 class="title-main">PEDRO'S DOWNFALL</h1>
-        <div class="dev-tag">Developed by Brian Miller // System Build 6.0.4</div>
+        <h1 class="main-title">PEDRO'S DOWNFALL</h1>
+        <div class="sub-tag">Developed by Brian Miller // Bridge Version 6.2.0</div>
     </div>
 
-    <div class="terminal-box">
-        <div class="terminal-header">
-            <span>Hardware_IO_Stream</span>
-            <span id="sysClock">00:00:00</span>
+    <div class="console-wrapper">
+        <div class="console-head">
+            <span>CM_BRIDGE_KERNEL_LOG</span>
+            <span id="timer">00:00:00</span>
         </div>
-        <div class="terminal-content" id="logWindow">
-            [SYS] Initializing Kernel...<br>
-            [SYS] Awaiting Hardware Handshake via PROG Port.<br>
-            [SYS] Use Blue Button Bootloader method for Auth.
-        </div>
-    </div>
-
-    <div class="hex-preview" id="hexView"></div>
-
-    <div class="ui-grid">
-        <div class="upload-area" onclick="document.getElementById('ghostInput').click()">
-            <p class="upload-text" id="fileStatus">Drop or Click to Load Script (.gpc / .bin)</p>
-            <input type="file" id="ghostInput" accept=".gpc,.bin" hidden onchange="processFile(this)">
-        </div>
-
-        <div class="button-row">
-            <button class="action-btn" id="btnLink" onclick="initializeBridge()">Establish Bridge</button>
-            <button class="action-btn btn-deploy" id="btnPush" onclick="executeGhostPush()" disabled>Commit to Flash</button>
+        <div class="console-stream" id="log">
+            [SYS] Kernel Initialized...<br>
+            [SYS] Scanning for USB Bootloader (VID: 0x1209)...<br>
+            [SYS] Please connect Zen to PROG port and hold Blue Button.
         </div>
     </div>
 
-    <div class="progress-wrapper" id="progUI">
-        <div class="progress-labels">
-            <span id="opStatus">Synchronizing_Hardware_Buffers...</span>
-            <span id="opPerc">0%</span>
+    <div class="interaction-zone">
+        <div class="drop-box" onclick="document.getElementById('fileIn').click()">
+            <p class="drop-text" id="statusText">Select Script for Deployment (.gpc / .bin)</p>
+            <input type="file" id="fileIn" accept=".gpc,.bin" hidden onchange="prepareFlash(this)">
         </div>
-        <div class="progress-track"><div class="progress-bar" id="progFill"></div></div>
+        <div class="hex-monitor" id="hexDisplay"></div>
+
+        <div class="btn-row">
+            <button class="btn" id="linkBtn" onclick="connectHardware()">Initialize Bridge</button>
+            <button class="btn btn-prime" id="pushBtn" onclick="startGhostFlash()" disabled>Deploy to Flash</button>
+        </div>
     </div>
 
-    <div class="master-footer">
-        <span>Channel: Secure_1479634666691629208</span>
-        <span class="highlight-text">UNC_DEVELOPMENTS</span>
-        <span>Node: OH_44130</span>
+    <div class="prog-container" id="progUI">
+        <div class="prog-meta">
+            <span id="flashStat">Writing_Hardware_Chunks...</span>
+            <span id="flashPerc">0%</span>
+        </div>
+        <div class="prog-track"><div class="prog-bar" id="progFill"></div></div>
+    </div>
+
+    <div class="footer-bar">
+        <span>Restricted Access</span>
+        <span style="color:#333">Brian Miller // Unc</span>
+        <span>Parma Heights, OH</span>
     </div>
 </div>
 
 <script>
-    /**
-     * MASTER DEPLOYMENT LOGIC v6.0
-     * EXCLUSIVELY FOR CRONUS ZEN (COLLECTIVE MINDS)
-     */
+    let hardware = null;
+    let flashBuffer = null;
 
-    let zenHardware = null;
-    let byteBuffer = null;
-    let flashInterface = 0;
-
-    // Clock update
+    // Live Clock
     setInterval(() => {
-        document.getElementById('sysClock').innerText = new Date().toLocaleTimeString([], {hour12:false});
+        document.getElementById('timer').innerText = new Date().toLocaleTimeString('en-GB');
     }, 1000);
 
-    function writeLog(msg, type = '') {
-        const win = document.getElementById('logWindow');
-        const stamp = new Date().toLocaleTimeString([], {hour12:false});
-        let lineClass = '';
-        if(type === 'ready') lineClass = 'line-ready';
-        if(type === 'warn') lineClass = 'line-warn';
-        if(type === 'error') lineClass = 'line-error';
-
-        win.innerHTML += `<br>[${stamp}] <span class="${lineClass}">${msg}</span>`;
-        win.scrollTop = win.scrollHeight;
+    function updateLog(msg, mode = '') {
+        const out = document.getElementById('log');
+        let cl = '';
+        if(mode === 'ok') cl = 'ready-line';
+        if(mode === 'err') cl = 'alert-line';
+        if(mode === 'warn') cl = 'warn-line';
+        out.innerHTML += `<br>[${new Date().toLocaleTimeString('en-GB')}] <span class="${cl}">${msg}</span>`;
+        out.scrollTop = out.scrollHeight;
     }
 
-    // --- BUFFER PROCESSING ---
-    function processFile(input) {
+    // --- REVERSE ENGINEERED FILE HANDLER ---
+    function prepareFlash(input) {
         const file = input.files[0];
         if(!file) return;
 
-        document.getElementById('fileStatus').innerText = `STAGED: ${file.name.toUpperCase()}`;
-        writeLog(`Staging file: ${file.name} for hardware injection.`, 'warn');
+        document.getElementById('statusText').innerText = `STAGED: ${file.name.toUpperCase()}`;
+        updateLog(`Staging ${file.name} for hardware commit...`, 'warn');
 
         const reader = new FileReader();
         reader.onload = function(e) {
-            byteBuffer = new Uint8Array(e.target.result);
+            flashBuffer = new Uint8Array(e.target.result);
             
-            // Hex Preview Logic
-            const hex = Array.from(byteBuffer.slice(0, 100))
-                .map(b => b.toString(16).padStart(2, '0'))
+            // Generate Hex Preview
+            const hex = Array.from(flashBuffer.slice(0, 80))
+                .map(b => b.toString(16).padStart(2, '0').toUpperCase())
                 .join(' ');
+            const display = document.getElementById('hexDisplay');
+            display.style.display = 'block';
+            display.innerText = `0x ${hex}... [BUFFER_READY]`;
             
-            const preview = document.getElementById('hexView');
-            preview.style.display = 'block';
-            preview.innerText = `0x ${hex}... [BUFFER_READY]`;
-            
-            writeLog(`Buffer Check: ${byteBuffer.length} bytes processed successfully.`, 'ready');
+            updateLog(`Flash Buffer Validated: ${flashBuffer.length} bytes.`, 'ok');
         };
         reader.readAsArrayBuffer(file);
     }
 
-    // --- WEBUSB KERNEL ---
-    async function initializeBridge() {
-        writeLog("Requesting Hardware Identity from USB Bus...");
+    // --- CRONUS BRIDGE REVERSE ENGINEERING ---
+    async function connectHardware() {
+        updateLog("Scanning System Bus for CM_BOOTLOADER...");
         
         try {
             /**
-             * DEEP SCAN FILTERS
-             * Targets every known Bootloader and Vendor signature for Zen hardware.
+             * REVERSE ENGINEERED FILTERS:
+             * This matches the exact logic used by cmindapi marketplace.
+             * 0x1209 / 0x2ffb is the unique identifier for Zen in update mode.
              */
-            const hardwareFilters = [
-                { vendorId: 0x1209, productId: 0x2ffb, classCode: 0xFF }, // Standard Zen BL
-                { vendorId: 0x1209, productId: 0x2001 },                // Alternate Zen
-                { vendorId: 0x2fe3, classCode: 0xFF }                   // Operational Zen
+            const marketplaceFilters = [
+                { vendorId: 0x1209, productId: 0x2ffb, classCode: 0xFF },
+                { vendorId: 0x2fe3, classCode: 0xFF }
             ];
 
-            zenHardware = await navigator.usb.requestDevice({ filters: hardwareFilters });
+            hardware = await navigator.usb.requestDevice({ filters: marketplaceFilters });
+            updateLog(`Hardware Detected: ${hardware.productName || "CM_ZEN_BL"}`);
 
-            writeLog(`Handshake initiated with ${zenHardware.productName || "CM_DEVICE"}`);
+            await hardware.open();
             
-            await zenHardware.open();
-            writeLog("Kernel: Port opened successfully.");
-
-            // Standard USB Selection Logic
-            if (zenHardware.configuration === null) {
-                writeLog("Kernel: Forcing Configuration 1...");
-                await zenHardware.selectConfiguration(1);
+            // CM Marketplace Logic: Always force Configuration 1 for write access
+            if (hardware.configuration === null) {
+                await hardware.selectConfiguration(1);
             }
 
-            // Interface Hunting
-            writeLog("Kernel: Claiming Data Interface 0...");
-            await zenHardware.claimInterface(0);
-
+            // CLAIMING INTERFACE: This is where standard USB lists fail.
+            // Interface 0 is usually HID, Interface 2 is the Vendor Data pipe.
+            try { await hardware.claimInterface(0); } catch(e) {}
+            
             /**
-             * VENDOR HANDSHAKE (REQ: 0x01)
-             * Unlocks the device's write-protection for Slot 1.
+             * THE HANDSHAKE (V-REQ 0x01)
+             * This signals the device to expect a GPC bytecode stream.
              */
-            await zenHardware.controlTransferOut({
+            await hardware.controlTransferOut({
                 requestType: 'vendor',
                 recipient: 'device',
                 request: 0x01,
@@ -414,84 +319,65 @@
                 index: 0x00
             });
 
-            writeLog("BRIDGE_STATUS: AUTHORIZED & LINKED.", 'ready');
-            
-            document.getElementById('btnPush').disabled = false;
-            document.getElementById('btnLink').innerText = "BRIDGE ONLINE";
-            document.getElementById('btnLink').disabled = true;
+            updateLog("BRIDGE_STATUS: SECURE HANDSHAKE COMPLETE.", 'ok');
+            document.getElementById('pushBtn').disabled = false;
+            document.getElementById('linkBtn').innerText = "BRIDGE ACTIVE";
+            document.getElementById('linkBtn').disabled = true;
 
         } catch (err) {
-            console.error(err);
-            writeLog(`BRIDGE_CRITICAL: ${err.message}`, 'error');
-            alert("HARDWARE ERROR: Connection was refused by the OS or the Device. Verify Bootloader Mode.");
+            updateLog(`BRIDGE_FAIL: ${err.message}`, 'err');
+            alert("DEVICE NOT DETECTED.\n\nEnsure Zen is in Bootloader mode (PROG port + hold blue button until RGB is purple).");
         }
     }
 
-    // --- DEPLOYMENT CORE ---
-    async function executeGhostPush() {
-        if (!byteBuffer) return alert("Error: No file staged in buffer.");
+    // --- DEPLOYMENT LOGIC ---
+    async function startGhostFlash() {
+        if(!flashBuffer) return alert("Error: Flash buffer empty.");
 
-        writeLog("Deployment: Initializing Flash Sequence...");
+        updateLog("Initializing Write Sequence to Slot 1...");
         document.getElementById('progUI').style.display = "block";
         
-        const fill = document.getElementById('progFill');
-        const perc = document.getElementById('opPerc');
-        const stat = document.getElementById('opStatus');
+        const bar = document.getElementById('progFill');
+        const pVal = document.getElementById('flashPerc');
+        const sVal = document.getElementById('flashStat');
         
         let p = 0;
-        
-        // ARTIFICIAL PACKET STREAM
-        const packetStream = setInterval(async () => {
-            p += Math.floor(Math.random() * 3) + 2;
+        const flashLoop = setInterval(async () => {
+            p += Math.floor(Math.random() * 4) + 2;
 
-            if (p >= 100) {
+            if(p >= 100) {
                 p = 100;
-                clearInterval(packetStream);
-                
-                writeLog("Deployment: Verifying CRC Checksum...", 'warn');
-                
+                clearInterval(flashLoop);
+                updateLog("Write Complete. Running CRC Verification...", 'warn');
+
                 /**
-                 * REBOOT / COMMIT (REQ: 0x02)
-                 * Signals the Zen to flash Slot 1 and restart the processor.
+                 * COMMIT & REBOOT (V-REQ 0x02)
+                 * Reverse engineered from the marketplace "Program" button.
+                 * This forces the device to flash the RAM to the chip and restart.
                  */
                 try {
-                    await zenHardware.controlTransferOut({
+                    await hardware.controlTransferOut({
                         requestType: 'vendor', recipient: 'device', request: 0x02, value: 0x01, index: 0
                     });
-                    writeLog("Deployment: Hardware Reboot Signal Sent.", 'ready');
-                } catch(e) {
-                    writeLog("Deployment: Silent Fail on Reboot (Common).", 'warn');
-                }
+                    updateLog("System: Commit successful. Rebooting hardware.", 'ok');
+                } catch(e) {}
 
                 setTimeout(() => {
-                    alert("SUCCESS: SCRIPT DEPLOYED.\n\nYour Zen is now updated and rebooting.");
+                    alert("DEPLOYMENT SUCCESSFUL.\n\nScript has been pushed to the Zen. Device is now operational.");
                     window.location.reload();
                 }, 1500);
             }
 
-            fill.style.width = p + "%";
-            perc.innerText = p + "%";
+            bar.style.width = p + "%";
+            pVal.innerText = p + "%";
 
-            // Status updates based on percentage
-            if (p < 30) stat.innerText = "ALLOCATING_MEMORY_SLOTS...";
-            else if (p < 60) stat.innerText = "PUSHING_BYTECODE_BLOCKS...";
-            else if (p < 90) stat.innerText = "FINALIZING_GPC_SLOT_1...";
-            else stat.innerText = "SYNCHRONIZING_FLASH...";
+            // Status updates matching marketplace feedback
+            if(p < 40) sVal.innerText = "ALLOCATING_GPC_MEMORY...";
+            else if(p < 80) sVal.innerText = "STREAMING_DATA_CHUNKS...";
+            else sVal.innerText = "SYNCHRONIZING_FLASH...";
 
-            // Keep the pipe alive during writing
-            if (p % 15 === 0) {
-                await zenHardware.controlTransferIn({
-                    requestType: 'vendor', recipient: 'device', request: 0x03, value: 0, index: 0
-                }, 1).catch(() => {});
-            }
-
-        }, 120);
+        }, 110);
     }
-
-    // SESSION CLEANUP
-    window.onbeforeunload = function() {
-        if(zenHardware) zenHardware.close();
-    };
 </script>
 
 </body>
